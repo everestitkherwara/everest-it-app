@@ -1,0 +1,73 @@
+<svg viewBox="0 0 800 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;display=swap');
+      .handwritten { font-family: 'Caveat', cursive; font-weight: 700; }
+      .branding { font-family: 'Arial', sans-serif; font-weight: 900; }
+    </style>
+    <filter id="handEffect">
+      <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="1200" fill="#fffef7" />
+
+  <g stroke="#a5b4fc" stroke-width="0.8" opacity="0.4">
+    <line x1="0" y1="40" x2="800" y2="40" /><line x1="0" y1="80" x2="800" y2="80" /><line x1="0" y1="120" x2="800" y2="120" /><line x1="0" y1="160" x2="800" y2="160" /><line x1="0" y1="200" x2="800" y2="200" /><line x1="0" y1="240" x2="800" y2="240" /><line x1="0" y1="280" x2="800" y2="280" /><line x1="0" y1="320" x2="800" y2="320" /><line x1="0" y1="360" x2="800" y2="360" /><line x1="0" y1="400" x2="800" y2="400" /><line x1="0" y1="440" x2="800" y2="440" /><line x1="0" y1="480" x2="800" y2="480" /><line x1="0" y1="520" x2="800" y2="520" /><line x1="0" y1="560" x2="800" y2="560" /><line x1="0" y1="600" x2="800" y2="600" /><line x1="0" y1="640" x2="800" y2="640" /><line x1="0" y1="680" x2="800" y2="680" /><line x1="0" y1="720" x2="800" y2="720" /><line x1="0" y1="760" x2="800" y2="760" /><line x1="0" y1="800" x2="800" y2="800" /><line x1="0" y1="840" x2="800" y2="840" /><line x1="0" y1="880" x2="800" y2="880" /><line x1="0" y1="920" x2="800" y2="920" /><line x1="0" y1="960" x2="800" y2="960" /><line x1="0" y1="1000" x2="800" y2="1000" /><line x1="0" y1="1040" x2="800" y2="1040" /><line x1="0" y1="1080" x2="800" y2="1080" /><line x1="0" y1="1120" x2="800" y2="1120" /><line x1="0" y1="1160" x2="800" y2="1160" />
+  </g>
+  <line x1="85" y1="0" x2="85" y2="1200" stroke="#fca5a5" stroke-width="2" />
+  <line x1="0" y1="115" x2="800" y2="115" stroke="#fca5a5" stroke-width="1.5" />
+
+  <g transform="translate(30, 10)">
+    <circle cx="50" cy="50" r="45" fill="white" stroke="#166534" stroke-width="2.5" />
+    <text x="50" y="45" font-family="Arial" font-size="12" font-weight="900" fill="#166534" text-anchor="middle">EVEREST IT</text>
+    <text x="50" y="65" font-family="Arial" font-size="14" font-weight="900" fill="#166534" text-anchor="middle">ज्ञान केंद्र</text>
+    <text x="350" y="40" class="branding" font-size="36" fill="#065f46" text-anchor="middle">EVEREST IT ज्ञान केंद्र, खेरवाड़ा</text>
+    <text x="350" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#dc2626" text-anchor="middle">TALLY PRIME &amp; ADVANCED ACCOUNTING</text>
+    <rect x="620" y="5" width="120" height="70" rx="10" fill="none" stroke="#166534" stroke-width="1" />
+    <text x="680" y="25" font-family="Arial" font-size="10" font-weight="bold" fill="#166534" text-anchor="middle">सीखें | बढ़ें | सफल बनें</text>
+    <text x="680" y="55" font-family="Arial" font-size="14" font-weight="900" fill="#166534" text-anchor="middle">9636049901</text>
+  </g>
+
+  <g transform="translate(100, 130)" filter="url(#handEffect)">
+    <rect x="50" y="0" width="450" height="55" rx="27" fill="#dcfce7" stroke="#166534" stroke-width="2" />
+    <text x="275" y="40" class="handwritten" font-size="30" fill="#166534" text-anchor="middle">Chapter 2 : Inventory Management</text>
+
+    <g transform="translate(0, 80)">
+       <rect x="-5" y="-18" width="550" height="32" fill="#ecfdf5" rx="5" />
+       <text x="0" y="10" class="handwritten" font-size="26" fill="#065f46">2.1 इन्वेंटरी (Inventory) क्या है?</text>
+       <text x="15" y="55" class="handwritten" font-size="22" fill="#1e293b">व्यापार में खरीदी और बेची जाने वाली वस्तुओं के स्टॉक को</text>
+       <text x="15" y="85" class="handwritten" font-size="22" fill="#1e293b">'इन्वेंटरी' या 'स्टॉक' कहा जाता है । Tally में स्टॉक का सही</text>
+       <text x="15" y="115" class="handwritten" font-size="22" fill="#1e293b">रिकॉर्ड रखना ही Inventory Management है ।</text>
+    </g>
+
+    <g transform="translate(0, 230)">
+       <text x="0" y="10" class="handwritten" font-size="24" fill="#1e40af">स्टॉक रिकॉर्ड करने के 3 मुख्य चरण :-</text>
+       <text x="20" y="50" class="handwritten" font-size="22" fill="#1e293b">1. Unit of Measure (मापने की इकाई) - जैसे Pcs, Kg, Box.</text>
+       <text x="20" y="85" class="handwritten" font-size="22" fill="#1e293b">2. Stock Groups (स्टॉक ग्रुप) - जैसे Mobile, Grocery.</text>
+       <text x="20" y="120" class="handwritten" font-size="22" fill="#1e293b">3. Stock Items (स्टॉक आइटम) - जैसे Samsung M31, Rice.</text>
+    </g>
+
+    <g transform="translate(0, 420)">
+       <rect x="-5" y="-18" width="550" height="32" fill="#fff7ed" rx="5" />
+       <text x="0" y="10" class="handwritten" font-size="26" fill="#9a3412">2.2 Unit of Measure (इकाई)</text>
+       <text x="15" y="50" class="handwritten" font-size="22" fill="#1e293b">वस्तुओं को किस रूप में गिना जाएगा, वह 'Unit' है ।</text>
+       <text x="25" y="90" class="handwritten" font-size="20" fill="#475569">● Simple Unit: Nos, Pcs, Kgs.</text>
+       <text x="25" y="125" class="handwritten" font-size="20" fill="#475569">● Compound Unit: 1 Box = 12 Nos.</text>
+    </g>
+
+    <g transform="translate(0, 600)">
+       <rect x="-10" y="0" width="550" height="180" rx="20" fill="#fef2f2" stroke="#dc2626" stroke-width="2" />
+       <text x="20" y="40" class="handwritten" font-size="24" fill="#991b1b">Inventory Highlights :-</text>
+       <text x="40" y="80" class="handwritten" font-size="20" fill="#422006">● Stock Group ब्रांड के अनुसार बना सकते हैं ।</text>
+       <text x="40" y="115" class="handwritten" font-size="20" fill="#422006">● Stock Item में GST दर (Rate) सेट की जाती है ।</text>
+       <text x="40" y="150" class="handwritten" font-size="20" fill="#422006">● Godown/Location फीचर से स्टॉक स्थान पता चलता है ।</text>
+    </g>
+
+    <text x="280" y="850" class="handwritten" font-size="22" font-weight="bold" fill="#059669" text-anchor="middle">"स्टॉक का सही मैनेजमेंट ही बिजनेस की सफलता है"</text>
+  </g>
+
+  <text x="100" y="1185" class="handwritten" font-size="20" fill="#475569">Page 1 / 2</text>
+  <text x="700" y="1185" class="branding" font-size="12" fill="#166534" text-anchor="end">EVEREST IT ज्ञान केंद्र, खेरवाड़ा</text>
+</svg>

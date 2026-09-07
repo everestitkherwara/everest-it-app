@@ -1,0 +1,130 @@
+<svg width="800" height="1200" viewBox="0 0 800 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;display=swap');
+      .handwritten { font-family: 'Caveat', cursive; font-weight: 700; }
+      .branding { font-family: 'Arial', sans-serif; font-weight: 900; }
+    </style>
+    <filter id="handEffect">
+      <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" />
+    </filter>
+  </defs>
+
+  <!-- Notebook Base -->
+  <rect width="800" height="1200" fill="#fffef7" />
+
+  <!-- Ruled Lines -->
+  <g stroke="#a5b4fc" stroke-width="0.8" opacity="0.4">
+    <line x1="0" y1="40" x2="800" y2="40" /><line x1="0" y1="80" x2="800" y2="80" /><line x1="0" y1="120" x2="800" y2="120" /><line x1="0" y1="160" x2="800" y2="160" /><line x1="0" y1="200" x2="800" y2="200" /><line x1="0" y1="240" x2="800" y2="240" /><line x1="0" y1="280" x2="800" y2="280" /><line x1="0" y1="320" x2="800" y2="320" /><line x1="0" y1="360" x2="800" y2="360" /><line x1="0" y1="400" x2="800" y2="400" /><line x1="0" y1="440" x2="800" y2="440" /><line x1="0" y1="480" x2="800" y2="480" /><line x1="0" y1="520" x2="800" y2="520" /><line x1="0" y1="560" x2="800" y2="560" /><line x1="0" y1="600" x2="800" y2="600" /><line x1="0" y1="640" x2="800" y2="640" /><line x1="0" y1="680" x2="800" y2="680" /><line x1="0" y1="720" x2="800" y2="720" /><line x1="0" y1="760" x2="800" y2="760" /><line x1="0" y1="800" x2="800" y2="800" /><line x1="0" y1="840" x2="800" y2="840" /><line x1="0" y1="880" x2="800" y2="880" /><line x1="0" y1="920" x2="800" y2="920" /><line x1="0" y1="960" x2="800" y2="960" /><line x1="0" y1="1000" x2="800" y2="1000" /><line x1="0" y1="1040" x2="800" y2="1040" /><line x1="0" y1="1080" x2="800" y2="1080" /><line x1="0" y1="1120" x2="800" y2="1120" /><line x1="0" y1="1160" x2="800" y2="1160" />
+  </g>
+  <line x1="85" y1="0" x2="85" y2="1200" stroke="#fca5a5" stroke-width="2" />
+  <line x1="0" y1="115" x2="800" y2="115" stroke="#fca5a5" stroke-width="1.5" />
+
+  <!-- Instituational Header -->
+  <g transform="translate(30, 10)">
+    <circle cx="50" cy="50" r="45" fill="white" stroke="#1e40af" stroke-width="2.5" />
+    <text x="50" y="45" font-family="Arial" font-size="12" font-weight="900" fill="#1e40af" text-anchor="middle">EVEREST IT</text>
+    <text x="50" y="65" font-family="Arial" font-size="14" font-weight="900" fill="#1e40af" text-anchor="middle">ज्ञान केंद्र</text>
+
+    <text x="380" y="40" class="branding" font-size="42" fill="#1e3a8a" text-anchor="middle">EVEREST IT ज्ञान केंद्र, खेरवाड़ा</text>
+    <text x="380" y="65" font-family="Arial" font-size="14" font-weight="bold" fill="#dc2626" text-anchor="middle">COMPUTER EDUCATION FOR A BRIGHT FUTURE</text>
+
+    <rect x="640" y="5" width="130" height="70" rx="10" fill="none" stroke="#1e40af" stroke-width="1" />
+    <text x="705" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">सीखें | बढ़ें | सफल बनें</text>
+    <text x="705" y="55" font-family="Arial" font-size="16" font-weight="900" fill="#1e40af" text-anchor="middle">9636049901</text>
+  </g>
+
+  <!-- Page Content Area -->
+  <g transform="translate(100, 130)" filter="url(#handEffect)">
+    <!-- Chapter Title -->
+    <rect x="150" y="0" width="380" height="55" rx="27" fill="#fbcfe8" stroke="#be123c" stroke-width="2" />
+    <text x="340" y="40" class="handwritten" font-size="32" fill="#be123c" text-anchor="middle">Chapter 1 : कम्प्यूटर का परिचय</text>
+
+    <!-- 1.1 Def -->
+    <g transform="translate(0, 80)">
+       <rect x="-5" y="-18" width="500" height="32" fill="#dbeafe" rx="5" />
+       <text x="0" y="10" class="handwritten" font-size="28" fill="#1e40af">1.1 कम्प्यूटर क्या है? (What is Computer?)</text>
+       <text x="15" y="55" class="handwritten" font-size="24" fill="#1e293b">कम्प्यूटर एक इलेक्ट्रॉनिक मशीन है, जो डेटा (Input) को प्राप्त कर, उस पर</text>
+       <text x="15" y="85" class="handwritten" font-size="24" fill="#1e293b">निर्देशों (Instructions) के अनुसार प्रक्रिया (Process) करता है और परिणाम (Output)</text>
+       <text x="15" y="115" class="handwritten" font-size="24" fill="#1e293b">देता है । यह बहुत तेज, सटीक और विश्वसनीय होता है ।</text>
+    </g>
+
+    <!-- 1.2 Working -->
+    <g transform="translate(0, 230)">
+       <rect x="-5" y="-18" width="580" height="32" fill="#fdf2f8" rx="5" />
+       <text x="0" y="10" class="handwritten" font-size="28" fill="#9d174d">1.2 कम्प्यूटर की कार्यप्रणाली (Working of Computer)</text>
+       <text x="15" y="50" class="handwritten" font-size="24" fill="#1e293b">कम्प्यूटर चार मुख्य चरणों में कार्य करता है -</text>
+
+       <g transform="translate(20, 85)">
+          <text x="0" y="0" class="handwritten" font-size="22" fill="#334155">① <tspan fill="#2563eb">Input (इनपुट)</tspan> - डेटा और निर्देशों को लेना ।</text>
+          <text x="0" y="40" class="handwritten" font-size="22" fill="#334155">② <tspan fill="#ea580c">Process (प्रोसेस)</tspan> - डेटा पर कार्य करना ।</text>
+          <text x="0" y="80" class="handwritten" font-size="22" fill="#334155">③ <tspan fill="#16a34a">Output (आउटपुट)</tspan> - परिणाम देना ।</text>
+          <text x="0" y="120" class="handwritten" font-size="22" fill="#334155">④ <tspan fill="#9333ea">Storage (भंडारण)</tspan> - डेटा और परिणाम को सुरक्षित रखना ।</text>
+       </g>
+    </g>
+
+    <!-- 1.3 Block Diagram -->
+    <g transform="translate(0, 470)">
+       <rect x="-5" y="-18" width="580" height="32" fill="#ccfbf1" rx="5" />
+       <text x="0" y="10" class="handwritten" font-size="28" fill="#0f766e">1.3 कम्प्यूटर का ब्लॉक डायग्राम (Block Diagram)</text>
+
+       <g transform="translate(10, 50)">
+          <!-- IPO Boxes -->
+          <rect x="0" y="80" width="130" height="70" rx="10" fill="white" stroke="#2563eb" stroke-width="2.5" />
+          <text x="65" y="115" class="handwritten" font-size="22" fill="#1e40af" text-anchor="middle">Input Unit</text>
+          <text x="65" y="135" class="handwritten" font-size="14" fill="#64748b" text-anchor="middle">(Keyboard, Mouse)</text>
+
+          <path d="M135,115 L195,115" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)" />
+
+          <!-- CPU Large Box -->
+          <rect x="200" y="0" width="240" height="230" rx="15" fill="#f8fafc" stroke="#1e293b" stroke-width="3" stroke-dasharray="8,4" />
+          <text x="320" y="-15" class="handwritten" font-size="26" fill="#1e293b" text-anchor="middle">CPU</text>
+          <text x="320" y="5" class="handwritten" font-size="12" fill="#64748b" text-anchor="middle">(Central Processing Unit)</text>
+
+          <rect x="215" y="30" width="210" height="50" rx="8" fill="#dcfce7" stroke="#16a34a" />
+          <text x="320" y="62" class="handwritten" font-size="20" fill="#166534" text-anchor="middle">CU (Control Unit)</text>
+
+          <rect x="215" y="95" width="210" height="50" rx="8" fill="#fee2e2" stroke="#dc2626" />
+          <text x="320" y="127" class="handwritten" font-size="20" fill="#991b1b" text-anchor="middle">ALU (Maths &amp; Logic)</text>
+
+          <rect x="215" y="160" width="210" height="50" rx="8" fill="#e0e7ff" stroke="#4338ca" />
+          <text x="320" y="192" class="handwritten" font-size="20" fill="#3730a3" text-anchor="middle">Memory Unit</text>
+
+          <path d="M445,115 L505,115" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)" />
+
+          <rect x="510" y="80" width="130" height="70" rx="10" fill="white" stroke="#16a34a" stroke-width="2.5" />
+          <text x="575" y="115" class="handwritten" font-size="22" fill="#15803d" text-anchor="middle">Output Unit</text>
+          <text x="575" y="135" class="handwritten" font-size="14" fill="#64748b" text-anchor="middle">(Monitor, Printer)</text>
+
+          <!-- Storage -->
+          <path d="M320,235 L320,285" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)" />
+          <rect x="230" y="290" width="180" height="70" rx="15" fill="#fef9c3" stroke="#eab308" stroke-width="2.5" />
+          <text x="320" y="325" class="handwritten" font-size="22" fill="#854d0e" text-anchor="middle">Storage Unit</text>
+          <text x="320" y="345" class="handwritten" font-size="14" fill="#854d0e" text-anchor="middle">(Hard Disk, Pendrive)</text>
+       </g>
+    </g>
+
+    <!-- Cloud Note -->
+    <g transform="translate(480, 850)">
+       <path d="M0,50 Q10,0 90,0 Q170,0 180,50 Q230,50 240,100 Q230,150 180,150 Q170,200 90,200 Q10,200 0,150 Q-50,150 -60,100 Q-50,50 0,50" fill="#fff9db" stroke="#eab308" stroke-width="2.5" />
+       <text x="90" y="70" class="handwritten" font-size="28" fill="#854d0e" text-anchor="middle">Note :-</text>
+       <text x="90" y="110" class="handwritten" font-size="20" fill="#854d0e" text-anchor="middle">CPU को कम्प्यूटर</text>
+       <text x="90" y="140" class="handwritten" font-size="20" fill="#854d0e" text-anchor="middle">का "Brain" कहा</text>
+       <text x="90" y="170" class="handwritten" font-size="20" fill="#854d0e" text-anchor="middle">जाता है ।</text>
+    </g>
+
+    <!-- Footer Quote -->
+    <text x="300" y="1020" class="handwritten" font-size="24" font-weight="bold" fill="#dc2626" text-anchor="middle">"ज्ञान से बढ़ेगा भारत, कम्प्यूटर से बनेगा उज्ज्वल भविष्य"</text>
+  </g>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+    </marker>
+  </defs>
+
+  <text x="100" y="1185" class="handwritten" font-size="22" fill="#475569">Page 1 / 3</text>
+  <text x="750" y="1185" class="branding" font-size="14" fill="#1e40af" text-anchor="end">EVEREST IT ज्ञान केंद्र, खेरवाड़ा</text>
+</svg>
