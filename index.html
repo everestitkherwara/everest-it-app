@@ -2992,7 +2992,7 @@
                                     <div class="flex-1">
                                         <h4 class="text-base font-black text-gray-800">${note.title}</h4>
                                         <div class="flex items-center gap-2 mt-2">
-                                            <span class="bg-brand-50 text-brand-600 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">${note.images.length} PAGES</span>
+                                            <span class="bg-brand-50 text-brand-600 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">${(cId === "rs-cfa" && note.id === 7) ? 17 : note.images.length} PAGES</span>
                                             <p class="text-[10px] text-brand-500 font-bold uppercase">CLICK TO VIEW →</p>
                                         </div>
                                     </div>
@@ -3009,6 +3009,107 @@
                 const cId = appState.activeCourse;
                 const ch = HANDWRITTEN_NOTES[cId]?.find(x => x.id === appState.activeHandwrittenChapter);
                 if(!ch) return UI.handwrittenList();
+
+                // ONLY RS-CFA Chapter 7 (GST Advance) uses the built-in 17-page GST viewer.
+                if(cId === 'rs-cfa' && appState.activeHandwrittenChapter === 7) {
+                const totalPages = 17;
+                const currentPage = Math.min(appState.notePage + 1, totalPages);
+
+                const pages = [
+                    {title:'GST क्या है?', sub:'GST का पूरा flow आसान भाषा और practical example से समझें', intro:'GST यानी Goods and Services Tax एक अप्रत्यक्ष कर है। Business जब taxable goods या services बेचता है तो applicable GST ग्राहक से लेता है और नियमों के अनुसार सरकार को जमा करता है।', sections:[
+                        ['Practical Example',['सामान की कीमत = ₹10,000','GST @ 18% = ₹1,800','ग्राहक से कुल राशि = ₹11,800','अगर eligible ITC उपलब्ध है, तो output GST से ITC घटाकर net liability निकाली जाती है।']],
+                        ['GST का Basic Flow',['Purchase → Input GST (ITC) → Sales → Output GST → ITC घटाने के बाद Net GST Payable','याद रखें: GST calculation में Supply, Taxable Value, Rate, ITC और Return मुख्य steps हैं।']]
+                    ],diagram:['Supplier / Business','↓','Customer से GST','↓','GST Liability / Return']},
+                    {title:'CGST, SGST और IGST', sub:'Intra-State और Inter-State sale को practical में समझें', intro:'एक ही राज्य में होने वाली सामान्य taxable supply में CGST + SGST और दूसरे राज्य की supply में सामान्यतः IGST लागू होता है।', sections:[
+                        ['Example 1 — Rajasthan → Rajasthan',['Taxable Value = ₹50,000','GST @18% = ₹9,000','CGST = ₹4,500 + SGST = ₹4,500']],
+                        ['Example 2 — Rajasthan → Gujarat',['Taxable Value = ₹50,000','GST @18% = ₹9,000','IGST = ₹9,000']],
+                        ['Easy Trick',['Same State = CGST + SGST | Other State = IGST']]
+                    ],diagram:['राजस्थान → राजस्थान','CGST + SGST','या','राजस्थान → गुजरात','IGST']},
+                    {title:'Supply — GST कब लगेगा?', sub:'Sale, Service और Bundle को practical तरीके से समझें', intro:'GST में सबसे महत्वपूर्ण concept Supply है। Transaction की वास्तविक प्रकृति और लागू GST provisions देखकर तय किया जाता है कि supply taxable है या नहीं।', sections:[
+                        ['Practical 1 — Goods Sale',['EVEREST IT ने ₹20,000 का taxable printer बेचा। Applicable rate के अनुसार GST calculate होगा और invoice में दिखाया जाएगा।']],
+                        ['Practical 2 — Service',['Consultant ने ₹30,000 की taxable service दी। Applicable GST rate के अनुसार tax invoice बनेगा।']],
+                        ['Practical 3 — Bundle',['Laptop + installation साथ दिए गए हों तो देखें कि transaction composite supply है या अलग-अलग supplies।']]
+                    ],diagram:['GOODS','🛒','SERVICES','💼','BUNDLE','📦 + 🔧']},
+                    {title:'Time & Place of Supply', sub:'GST किस समय और किस जगह की supply मानी जाएगी?', intro:'Time of Supply से पता चलता है कि tax किस period में आएगा और Place of Supply से supply का location/tax treatment तय करने में मदद मिलती है।', sections:[
+                        ['Time of Supply — Practical',['मान लीजिए service 10 जून को दी गई, invoice 12 जून को बना और payment 20 जून को हुआ। Applicable GST rules के अनुसार सही tax point तय किया जाता है।']],
+                        ['Place of Supply — Practical',['राजस्थान से गुजरात को goods भेजे जाते हैं तो place-of-supply rules के कारण inter-state treatment बन सकता है। Services में अलग rules हो सकते हैं।']],
+                        ['याद रखें',['TIME = कब tax लगेगा / किस period में आएगा | PLACE = supply कहाँ मानी जाएगी']]
+                    ],diagram:['INVOICE','→','TIME OF SUPPLY','→','TAX PERIOD']},
+                    {title:'Value of Supply', sub:'GST किस रकम पर calculate होता है?', intro:'Basic calculation में taxable value पर GST rate लगाया जाता है। Eligible discount आदि की treatment GST rules और documentation पर निर्भर करती है।', sections:[
+                        ['Practical Example',['Gross Price = ₹40,000','Eligible discount = ₹5,000','Taxable Value = ₹35,000','GST @18% = ₹6,300','Invoice Total = ₹41,300']],
+                        ['Formula',['Taxable Value × GST Rate = GST Amount','₹35,000 × 18% = ₹6,300']],
+                        ['ध्यान दें',['हर discount automatically taxable value से नहीं घटता। Discount की timing और invoice/documentation important है।']]
+                    ],diagram:['₹40,000','− ₹5,000 discount','↓','₹35,000 taxable value','× 18% = ₹6,300']},
+                    {title:'ITC — Input Tax Credit', sub:'Purchase GST को Sales GST से कैसे adjust करें?', intro:'Business purchase पर दिए गए eligible GST को Input Tax Credit कहा जाता है। Conditions पूरी होने पर यह output GST liability से adjust हो सकता है।', sections:[
+                        ['Practical Example',['Purchase = ₹50,000 + 18% GST = ₹9,000 ITC','Sales = ₹80,000 + 18% GST = ₹14,400 Output GST','Basic Net GST = ₹14,400 − ₹9,000 = ₹5,400']],
+                        ['ITC के लिए जरूरी बातें',['Valid tax invoice/document','Goods/Services वास्तव में प्राप्त हों','Applicable reporting/return conditions पूरी हों','Business use और अन्य statutory conditions लागू हों']],
+                        ['ITC नहीं मिलेगा — उदाहरण',['Personal use, कुछ blocked credits, non-GST purchase, fake/invalid invoice आदि में ITC उपलब्ध नहीं हो सकता।']]
+                    ],diagram:['Purchase GST','₹9,000 ITC','↓','Sales GST','₹14,400 Output','↓','NET = ₹5,400']},
+                    {title:'GST Registration', sub:'Registration को step-by-step practical तरीके से समझें', intro:'GST registration की liability turnover, supply type, state और अन्य conditions पर निर्भर करती है। इसलिए हर business में एक ही threshold blindly apply नहीं करना चाहिए।', sections:[
+                        ['Practical Process',['1. PAN, mobile और email तैयार करें','2. Business details और documents तैयार करें','3. GST portal पर application करें','4. Verification/ARN process पूरा करें','5. GSTIN मिलने पर compliant invoicing शुरू करें']],
+                        ['Example',['एक trader का turnover बढ़ रहा है और वह registration threshold के पास पहुँच रहा है। उसे समय-समय पर turnover और mandatory-registration conditions check करनी चाहिए।']]
+                    ],diagram:['BUSINESS','↓','DOCUMENTS','↓','GST APPLICATION','↓','GSTIN']},
+                    {title:'Tax Invoice, E-Invoice & E-Way Bill', sub:'तीनों का फर्क एक ही page पर', intro:'Tax Invoice sale का tax document है। E-Invoice eligible taxpayers के लिए prescribed electronic reporting process है। E-Way Bill लागू goods movement में transport document है।', sections:[
+                        ['Tax Invoice — Example',['₹1,00,000 taxable sale पर invoice में supplier/customer details, invoice number/date, taxable value, GST rate और tax amount जैसी required details रहती हैं।']],
+                        ['E-Invoice',['Applicable taxpayers में invoice data prescribed system पर report होकर IRN आदि generate हो सकता है। Applicability current rules के अनुसार check करें।']],
+                        ['E-Way Bill',['Goods movement में applicable cases में e-way bill बनता है। Threshold के साथ exceptions और current rules भी देखें।']]
+                    ],diagram:['TAX INVOICE','📄','E-INVOICE','🧾','E-WAY BILL','🚚']},
+                    {title:'RCM & Composition Scheme', sub:'Reverse Charge और Composition को practical में समझें', intro:'RCM में notified supplies की स्थिति में tax supplier की बजाय recipient द्वारा pay किया जा सकता है। Composition eligible small taxpayers के लिए simplified scheme है।', sections:[
+                        ['RCM — Practical',['मान लीजिए कोई notified service RCM के अंतर्गत आती है। Recipient applicable GST rules के अनुसार tax discharge करता है।']],
+                        ['Composition — Practical',['Eligible small taxpayer simplified scheme चुन सकता है, लेकिन eligibility, turnover limit, rate और restrictions applicable rules के अनुसार check करनी होती हैं।']],
+                        ['Easy Trick',['RCM = Recipient pays tax | Composition = Simplified scheme for eligible taxpayers']]
+                    ],diagram:['NORMAL','Supplier → Tax','RCM','Recipient → Tax','COMPOSITION','Simplified compliance']},
+                    {title:'GST Returns & Payment', sub:'Books से return और payment तक पूरा practical cycle', intro:'GST compliance में sales/purchase records, invoice matching, ITC calculation, return filing और tax payment का सही sequence जरूरी है।', sections:[
+                        ['Practical Monthly Cycle',['1. Purchase & Sales entries करें','2. Invoices और ITC documents मिलाएँ','3. Output GST निकालें','4. Eligible ITC adjust करें','5. Applicable return file करें','6. Tax liability pay करें']],
+                        ['Example',['Output GST = ₹25,000','Eligible ITC = ₹15,000','Basic Net Liability = ₹10,000','Actual payment में other applicable adjustments, reversals, interest आदि देखे जाते हैं।']]
+                    ],diagram:['BOOKS','→','RECONCILE','→','RETURN','→','PAYMENT']},
+                    {title:'Export, Zero Rated Supply & Refund', sub:'Export transaction को GST practical में समझें', intro:'Exports और specified SEZ supplies को GST law में zero-rated treatment मिलता है, subject to conditions. Refund mechanism prescribed rules के अनुसार हो सकता है।', sections:[
+                        ['Practical Example',['Eligible export value = ₹2,00,000','Export की zero-rated treatment के कारण domestic sale जैसा normal output-tax treatment नहीं होता; applicable export/refund mechanism follow किया जाता है।']],
+                        ['Refund के लिए records',['Invoices, shipping documents, bank/realisation records और GST returns जैसे supporting records व्यवस्थित रखना जरूरी है।']],
+                        ['Exam Point',['Zero-rated का मतलब केवल “tax नहीं” समझना पर्याप्त नहीं है। Export/SEZ के prescribed options और conditions भी समझें।']]
+                    ],diagram:['INDIAN BUSINESS','↓','EXPORT / SEZ','↓','ZERO-RATED','↓','ELIGIBLE REFUND / ITC']},
+                    {title:'Tally Practical — Complete GST Case Study', sub:'Purchase → Sales → ITC → Net GST की पूरी practical entry', intro:'अब पूरे GST को Tally-style example से समझें। नीचे दिए गए figures केवल learning example हैं।', sections:[
+                        ['Step 1 — Purchase Entry',['Computer Purchase = ₹50,000','GST @18% = ₹9,000','CGST ₹4,500 + SGST ₹4,500 (intra-state example)','Total Supplier Amount = ₹59,000']],
+                        ['Tally Purchase Entry',['Dr. Purchase A/c ........ ₹50,000','Dr. Input CGST A/c ..... ₹4,500','Dr. Input SGST A/c ..... ₹4,500','Cr. Supplier A/c ........ ₹59,000']],
+                        ['Step 2 — Sales Entry',['Sales = ₹80,000','GST @18% = ₹14,400','CGST ₹7,200 + SGST ₹7,200','Customer Total = ₹94,400']],
+                        ['Tally Sales Entry',['Dr. Customer A/c ........ ₹94,400','Cr. Sales A/c ............ ₹80,000','Cr. Output CGST A/c ..... ₹7,200','Cr. Output SGST A/c ..... ₹7,200']],
+                        ['Final Calculation',['Output GST ₹14,400 − Eligible ITC ₹9,000 = ₹5,400 basic net liability','Actual return/payment में credit utilisation और other applicable adjustments check करें।']]
+                    ],diagram:['PURCHASE','₹50,000 + GST ₹9,000','↓','ITC ₹9,000','↓','SALES','₹80,000 + GST ₹14,400','↓','NET GST ₹5,400']},
+                    {title:'GSTR-1 — Sales Return Practical', sub:'बिक्री की जानकारी GSTR-1 में कैसे समझें', intro:'GSTR-1 में outward supplies यानी बिक्री से संबंधित विवरण report किए जाते हैं। नीचे learning example से समझें।', sections:[['Practical Example',['अप्रैल में 2 sales हुईं: ₹50,000 + 18% GST और ₹30,000 + 18% GST।','कुल taxable sales = ₹80,000 और GST = ₹14,400।','Invoice number, date, customer details, taxable value और tax breakup को books से मिलाना चाहिए।']],],diagram:['SALES INVOICES','↓','INVOICE-WISE DETAILS','↓','GSTR-1','↓','OUTWARD SUPPLIES']},
+                    {title:'GSTR-3B — Liability & Payment Practical', sub:'Output GST और ITC से tax liability समझें', intro:'GSTR-3B में applicable summary figures के आधार पर tax liability और eligible ITC का practical calculation समझें।', sections:[['Practical Calculation',['Output GST = ₹14,400।','Eligible ITC = ₹9,000।','Basic net liability = ₹14,400 − ₹9,000 = ₹5,400।','Actual filing में applicable adjustments, reversals और other liabilities भी check की जाती हैं।']],],diagram:['OUTPUT GST','₹14,400','−','ELIGIBLE ITC','₹9,000','↓','BASIC LIABILITY','₹5,400']},
+                    {title:'GSTR-2B — ITC Reconciliation Practical', sub:'Purchase ITC को records से मिलाना सीखें', intro:'GSTR-2B में reflected ITC को purchase register और invoices से reconcile करना practical GST work का महत्वपूर्ण हिस्सा है।', sections:[['Practical Example',['Books में Input GST = ₹10,000 दिख रहा है।','GSTR-2B में reflected eligible ITC = ₹9,000 दिख रहा है।','Difference = ₹1,000। Difference वाले invoices और supplier reporting को check करें; eligibility भी verify करें।']],],diagram:['PURCHASE REGISTER','₹10,000 ITC','↔','GSTR-2B','₹9,000','↓','RECONCILE','₹1,000 DIFFERENCE']},
+                    {title:'GSTR-9 — Annual Return Practical', sub:'पूरे वर्ष के GST data का annual summary', intro:'GSTR-9 को annual return के रूप में समझें। पूरे वर्ष के applicable GST records को consolidate और reconcile किया जाता है।', sections:[['Practical Example',['वर्ष की taxable sales = ₹10,00,000।','पूरे वर्ष का output GST, ITC और filed returns के figures को books से reconcile करें।','Sales, purchase, ITC, tax paid और amendments की annual summary तैयार करें।']],],diagram:['MONTHLY RECORDS','↓','YEARLY SALES + ITC','↓','RECONCILIATION','↓','GSTR-9']},
+                    {title:'पूरा GST Return Practical Workflow', sub:'Tally से GSTR-1 → GSTR-2B → GSTR-3B → Annual Return', intro:'अब पूरे practical को एक flow में समझें। यही sequence GST return work को व्यवस्थित तरीके से समझने में मदद करता है।', sections:[['Step-by-Step Workflow',['1. Tally में Purchase और Sales entries करें।','2. Tax invoices और GST breakup check करें।','3. Sales data को GSTR-1 के लिए तैयार करें।','4. Purchase ITC को GSTR-2B से reconcile करें।','5. Output GST और eligible ITC से GSTR-3B liability निकालें।','6. Tax payment और return filing records सुरक्षित रखें।','7. पूरे वर्ष के data को reconcile करके applicable annual return तैयार करें।']],],diagram:['TALLY','↓','GSTR-1','↓','GSTR-2B RECONCILIATION','↓','GSTR-3B','↓','ANNUAL RETURN']}
+                ];
+                const p = pages[currentPage-1];
+                const sectionHtml = p.sections.map(s => `<section class="gst-sec"><h3>${s[0]}</h3>${s[1].map(x=>`<p>• ${x}</p>`).join('')}</section>`).join('');
+                const diagramHtml = p.diagram ? `<div class="gst-diagram">${p.diagram.map((x,i)=> i%2===1 && (x==='↓'||x==='→'||x==='या'||x==='× 18% = ₹6,300'||x==='🛒'||x==='💼'||x==='📦 + 🔧'||x==='📄'||x==='🧾'||x==='🚚') ? `<span class="gst-arrow">${x}</span>` : `<div class="gst-box">${x}</div>`).join('')}</div>` : '';
+                return `
+                    <style>
+                        .gst-poster{width:100%;max-width:620px;margin:0 auto;background:linear-gradient(180deg,#f7fbff 0%,#fff 38%,#f8fbff 100%);border-radius:20px;overflow:hidden;box-shadow:0 8px 25px rgba(15,52,96,.16);box-sizing:border-box;font-family:Arial,'Noto Sans Devanagari',sans-serif;color:#10245b}
+                        .gst-top{padding:12px 14px 10px;background:linear-gradient(135deg,#063a91,#125bd6);color:#fff;display:flex;align-items:center;gap:10px;box-sizing:border-box}
+                        .gst-top img{width:58px;height:58px;border-radius:50%;background:#fff;border:3px solid #ffd92f;object-fit:cover;flex:0 0 auto}
+                        .gst-brand{min-width:0;flex:1}.gst-brand b{display:block;font-size:20px;line-height:1.1}.gst-brand span{font-size:11px;font-weight:700;display:block;margin-top:5px}.gst-page{font-size:11px;background:#fff;color:#123b91;border-radius:10px;padding:7px 8px;font-weight:900;text-align:center;min-width:45px}
+                        .gst-title{margin:10px 12px 6px;padding:9px 11px;background:#e51d2a;color:#fff;border-radius:11px;font-size:21px;font-weight:900;line-height:1.18}.gst-sub{padding:0 14px 9px;font-size:13px;font-weight:700;color:#38527b}
+                        .gst-intro{margin:0 12px 9px;padding:11px 12px;background:#fff9dd;border:1px solid #f1d67a;border-radius:12px;font-size:14px;line-height:1.48;color:#222;font-weight:600}
+                        .gst-diagram{margin:8px 12px 10px;padding:10px;background:#edf6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;border:1px solid #c8ddf8}.gst-box{background:#fff;border:2px solid #1762d2;border-radius:10px;padding:8px 9px;min-width:82px;text-align:center;font-size:13px;font-weight:900;box-sizing:border-box}.gst-arrow{font-size:20px;font-weight:900;color:#e21e2e}
+                        .gst-sec{margin:0 12px 9px;background:#fff;border:1px solid #dce6f2;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,55,100,.06)}.gst-sec h3{margin:0;padding:7px 10px;background:linear-gradient(90deg,#075dcc,#1d78e8);color:#fff;font-size:16px;line-height:1.2}.gst-sec p{margin:0;padding:4px 10px;font-size:13.5px;line-height:1.4;color:#222;font-weight:600}.gst-sec p:nth-child(even){background:#f8fbff}
+                        .gst-note{margin:0 12px 10px;padding:9px 11px;background:#e7f7e9;border-left:5px solid #1e9b48;border-radius:9px;font-size:13px;font-weight:800}.gst-footer{background:#063a91;color:#fff;padding:10px 12px;display:grid;grid-template-columns:1.3fr 1fr;gap:10px;font-size:11.5px;line-height:1.4}.gst-footer b{color:#ffe400;font-size:13px}.gst-footer .gst-contact{text-align:right}.gst-nav{display:flex;justify-content:space-between;align-items:center;margin:10px 12px 14px;background:#fff;border-radius:13px;padding:9px 10px;box-shadow:0 3px 10px rgba(0,0,0,.08)}.gst-nav button{border:0;background:#edf2f7;border-radius:9px;padding:8px 12px;font-weight:900;color:#125bd6}.gst-nav button:disabled{color:#bbb}.gst-count{font-size:12px;font-weight:900;color:#125bd6}
+                        @media(max-width:480px){.gst-brand b{font-size:17px}.gst-title{font-size:19px}.gst-sec p{font-size:13px}.gst-footer{grid-template-columns:1fr}.gst-footer .gst-contact{text-align:left}}
+                    </style>
+                    <div class="gst-poster fade-in" id="swipable-container"
+                         ontouchstart="window.touchStartX = event.touches[0].clientX"
+                         ontouchend="let endX = event.changedTouches[0].clientX; let diff = window.touchStartX - endX; if(Math.abs(diff) > 50) actions.changeNotePage(diff > 0 ? 'next' : 'prev');">
+                        <div class="gst-top"><img src="${IMAGES.logo}" alt="EVEREST IT Logo"><div class="gst-brand"><b>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</b><span>RS-CIT | Tally | RS-CFA | AI | Computer Courses</span></div><div class="gst-page">PAGE<br>${currentPage}/17</div></div>
+                        <div class="gst-title">${p.title}</div><div class="gst-sub">${p.sub}</div><div class="gst-intro">${p.intro}</div>
+                        ${diagramHtml}${sectionHtml}
+                        <div class="gst-note">💡 याद रखें: Practical में हमेशा Invoice, GST Rate, Supply Type और ITC Eligibility को ध्यान से check करें।</div>
+                        <div class="gst-footer"><div><b>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</b><br>बजाज शोरूम के पास, उदयपुर रोड<br>खेरवाड़ा, जिला - उदयपुर (राज.) - 313803</div><div class="gst-contact"><b>मोबाइल</b><br>9636049901, 8003699626<br>Learn Today, Lead Tomorrow</div></div>
+                    </div>
+                    <div class="gst-nav"><button onclick="actions.changeNotePage('prev')" ${currentPage===1?'disabled':''}>‹ PREV</button><div class="gst-count">PAGE ${currentPage} / 17</div><button onclick="actions.changeNotePage('next')" ${currentPage===17?'disabled':''}>NEXT ›</button></div>
+                `;
+
+                }
 
                 const totalPages = ch.images.length;
                 const currentPage = appState.notePage + 1;
@@ -3059,6 +3160,7 @@
                         <img id="notePreviewImg" src="" alt="Preview">
                     </div>
                 `;
+
             },
 
             study: () => {
