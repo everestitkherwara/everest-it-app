@@ -2333,7 +2333,8 @@
             changeNotePage: (dir) => {
                 const cId = appState.activeCourse;
                 const ch = HANDWRITTEN_NOTES[cId]?.find(x => x.id === appState.activeHandwrittenChapter);
-                const pages = ch ? ch.images : [];
+                const isGST17 = cId === 'rs-cfa' && appState.activeHandwrittenChapter === 7;
+                const pages = isGST17 ? Array(17) : (ch ? ch.images : []);
                 if(pages.length === 0) return;
 
                 if(dir === 'next' && appState.notePage < pages.length - 1) {
