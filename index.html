@@ -75,6 +75,67 @@
         .option-btn { width: 100%; text-align: left; padding: 1rem; border-radius: 1rem; border: 2px solid #e5e7eb; background: white; font-weight: 600; margin-bottom: 0.75rem; transition: 0.2s; }
         .option-btn.selected { border-color: var(--brand-500); background: var(--brand-50); color: var(--brand-900); }
 
+
+        /* Today's Daily Test */
+        .today-test-card { background: linear-gradient(135deg,#eff6ff 0%,#ffffff 55%,#dbeafe 100%); border: 2px solid #60a5fa; border-radius: 28px; padding: 20px; box-shadow: 0 10px 25px rgba(37,99,235,.15); position: relative; overflow: hidden; }
+        .today-test-card:after { content:'🎯'; position:absolute; right:-5px; top:-15px; font-size:72px; opacity:.10; }
+        .today-test-badge { display:inline-block; background:#dc2626; color:white; padding:6px 12px; border-radius:999px; font-size:11px; font-weight:900; letter-spacing:.5px; margin-bottom:10px; }
+        .today-test-card h2 { margin:0 0 4px; font-size:24px; font-weight:950; color:#0f3b8f; }
+        .today-test-card p { margin:0 0 12px; color:#475569; font-size:14px; }
+        .today-test-title { font-size:15px; font-weight:950; color:#172554; line-height:1.35; }
+        .today-test-meta { margin-top:6px; font-size:10px; font-weight:800; color:#64748b; }
+        .today-test-btn { margin-top:16px; width:100%; background:#2563eb; color:white; padding:13px 16px; border-radius:15px; font-weight:950; font-size:14px; box-shadow:0 7px 15px rgba(37,99,235,.25); display:flex; align-items:center; justify-content:center; gap:7px; }
+
+
+        /* Fixed hero styles for dynamically rendered Admin/Result screens */
+        .everest-result-hero {
+            background: linear-gradient(135deg, #1d4ed8 0%, #3730a3 55%, #4f46e5 100%) !important;
+            color: #ffffff !important;
+            border-radius: 28px !important;
+            padding: 24px !important;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.22) !important;
+            margin-bottom: 20px !important;
+            text-align: center !important;
+        }
+        .everest-result-hero h2,
+        .everest-result-hero p {
+            color: #ffffff !important;
+        }
+        .everest-result-hero p {
+            opacity: .9;
+        }
+        .everest-admin-hero {
+            background: linear-gradient(135deg, #172554 0%, #3730a3 55%, #581c87 100%) !important;
+            color: #ffffff !important;
+            border-radius: 30px !important;
+            padding: 24px !important;
+            box-shadow: 0 14px 34px rgba(30, 41, 59, 0.22) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .everest-admin-hero h2,
+        .everest-admin-hero p,
+        .everest-admin-hero .admin-label {
+            color: #ffffff !important;
+        }
+        .everest-admin-hero .admin-label {
+            background: rgba(255,255,255,.14) !important;
+            border-radius: 999px !important;
+            padding: 5px 10px !important;
+            display: inline-flex !important;
+            font-size: 9px !important;
+            font-weight: 900 !important;
+            letter-spacing: .08em !important;
+        }
+        .everest-admin-hero .admin-sub {
+            color: #c7d2fe !important;
+        }
+        .everest-admin-hero .admin-logout {
+            background: rgba(255,255,255,.14) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+        }
+
         /* Admin Styles */
         .admin-card { background: white; border-radius: 1.5rem; padding: 1.25rem; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; gap: 0.75rem; text-align: center; }
         .admin-icon { width: 48px; height: 48px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; }
@@ -334,11 +395,205 @@
             border-radius: 50%;
         }
     </style>
+
+<style id="everest-admin-login-premium">
+.everest-admin-login-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    margin-top: 18px !important;
+}
+.everest-admin-login-actions .everest-login-btn {
+    flex: 1 1 240px !important;
+    min-height: 52px !important;
+    border: 0 !important;
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, #1d4ed8, #4338ca) !important;
+    color: #fff !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    box-shadow: 0 8px 18px rgba(37,99,235,.22) !important;
+}
+.everest-admin-login-actions .everest-login-btn:hover {
+    filter: brightness(1.05) !important;
+}
+.everest-admin-login-actions .everest-forgot-btn,
+.everest-admin-login-actions .everest-back-btn {
+    min-height: 44px !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-weight: 900 !important;
+    border: 1px solid #dbe4f0 !important;
+    background: #f8fafc !important;
+    color: #1e3a8a !important;
+}
+.everest-admin-login-actions .everest-forgot-btn:hover,
+.everest-admin-login-actions .everest-back-btn:hover {
+    background: #eef4ff !important;
+}
+</style>
+
+
+<style id="everest-admin-login-buttons-fix">
+/* Admin login action row */
+button.everest-force-login,
+a.everest-force-login {
+  background: linear-gradient(135deg, #2563eb 0%, #4338ca 100%) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  min-height: 52px !important;
+  padding: 0 22px !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  box-shadow: 0 8px 20px rgba(37,99,235,.28) !important;
+  text-shadow: none !important;
+}
+button.everest-force-forgot,
+a.everest-force-forgot {
+  background: #eef4ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #c7d7fe !important;
+  border-radius: 12px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+}
+button.everest-force-back,
+a.everest-force-back {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 12px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+}
+
+
+/* Fallback for the current dynamically-rendered admin login controls */
+.admin-login-actions button:first-child,
+.admin-login-actions a:first-child {
+  background: linear-gradient(135deg,#2563eb,#4338ca) !important;
+  color:#fff !important;
+  border:0 !important;
+  border-radius:14px !important;
+  font-weight:900 !important;
+}
+
+
+<style id="everest-branded-login-ui">
+.everest-login-card{background:#fff;border-radius:28px;box-shadow:0 16px 38px rgba(15,23,42,.12);border:1px solid #dbeafe;overflow:hidden;padding-bottom:18px;}
+.everest-login-brandbar{display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;}
+.everest-login-brand-logo{width:58px;height:58px;border-radius:50%;background:#fff;padding:3px;flex:none;box-shadow:0 4px 12px rgba(0,0,0,.18);}.everest-login-brand-logo img{width:100%;height:100%;object-fit:contain;border-radius:50%;}
+.everest-login-brand-text{min-width:0;flex:1}.everest-login-brand-name{font-size:16px;font-weight:900;line-height:1.15;}.everest-login-brand-place{font-size:11px;font-weight:800;opacity:.9;margin-top:3px}.everest-login-brand-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);font-size:20px;flex:none;}
+.everest-login-heading{text-align:center;padding:22px 18px 14px}.everest-login-round-icon{width:58px;height:58px;border-radius:50%;margin:0 auto 10px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:27px;box-shadow:0 8px 18px rgba(37,99,235,.22)}.everest-login-heading h2{font-size:26px;font-weight:950;color:#0f172a;margin:0}.everest-login-heading p{font-size:12px;font-weight:800;color:#64748b;margin:5px 0 10px}.everest-login-tagline{background:#eff6ff;color:#1e40af;border:1px solid #dbeafe;border-radius:999px;padding:9px 12px;font-size:11px;font-weight:800}.everest-login-card form{padding:0 18px}.everest-login-main-btn{width:100%;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#2563eb,#4338ca);color:#fff;font-size:15px;font-weight:950;box-shadow:0 9px 20px rgba(37,99,235,.25);display:flex;align-items:center;justify-content:center;gap:10px}.everest-login-main-btn span{font-size:28px;line-height:1}.everest-login-back-btn{width:100%;min-height:46px;border-radius:13px;background:#f1f5f9;color:#334155;border:1px solid #dbe3ec;font-weight:900}.everest-login-secondary-row{display:flex;gap:9px;align-items:center}.everest-login-forgot-btn{flex:1;min-height:46px;border-radius:13px;background:#eff6ff;color:#1d4ed8;border:1px solid #c7d7fe;font-weight:900}.everest-login-small-back{min-height:46px;padding:0 15px;border-radius:13px;background:#f1f5f9;color:#475569;border:1px solid #dbe3ec;font-weight:900}.everest-login-footer{text-align:center;color:#64748b;font-size:11px;font-weight:800;margin:16px 0 0}.everest-login-card .input-field{background:#f8fbff;border:2px solid #e2e8f0;border-radius:13px;min-height:50px;font-weight:700}.everest-login-card .input-field:focus{border-color:#60a5fa;outline:none;box-shadow:0 0 0 3px rgba(96,165,250,.14)}
+@media(max-width:420px){.everest-login-brand-name{font-size:14px}.everest-login-heading h2{font-size:24px}.everest-login-brandbar{padding:12px}.everest-login-brand-logo{width:52px;height:52px}}
+</style>
+
+
+<style id="everest-admin-buttons-fixed">
+/* Admin dashboard action cards: explicit styling so they never fall back to pale/white buttons */
+.everest-admin-quick-btn{
+    width:100% !important;
+    min-height:130px !important;
+    border:0 !important;
+    border-radius:20px !important;
+    padding:16px !important;
+    text-align:left !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    box-shadow:0 8px 18px rgba(15,23,42,.10) !important;
+    color:#fff !important;
+}
+.everest-admin-quick-btn .quick-title{
+    color:#fff !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+}
+.everest-admin-quick-btn .quick-sub{
+    font-size:9px !important;
+    margin-top:4px !important;
+    font-weight:700 !important;
+}
+.everest-admin-quick-btn.results{background:linear-gradient(135deg,#16a34a,#15803d) !important;}
+.everest-admin-quick-btn.results .quick-sub{color:#dcfce7 !important;}
+.everest-admin-quick-btn.setup{background:linear-gradient(135deg,#2563eb,#1d4ed8) !important;}
+.everest-admin-quick-btn.setup .quick-sub{color:#dbeafe !important;}
+.everest-admin-quick-btn.questions{background:linear-gradient(135deg,#7c3aed,#6d28d9) !important;}
+.everest-admin-quick-btn.questions .quick-sub{color:#ede9fe !important;}
+.everest-admin-quick-btn.key{background:linear-gradient(135deg,#f97316,#ea580c) !important;}
+.everest-admin-quick-btn.key .quick-sub{color:#ffedd5 !important;}
+.everest-admin-quick-btn:active{transform:scale(.98) !important;}
+</style>
+
 </head>
 <body>
     <div id="root"></div>
 
-    <script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9ZDZ3gsiyWsecs22WSH9rZZOx9qQe55Y",
+    authDomain: "everest-it-daily-test-e6e29.firebaseapp.com",
+    projectId: "everest-it-daily-test-e6e29",
+    storageBucket: "everest-it-daily-test-e6e29.firebasestorage.app",
+    messagingSenderId: "4376529785",
+    appId: "1:4376529785:web:202f187be5e53d72ddfda8",
+    measurementId: "G-BKNKMELPRB"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const firestore = getFirestore(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  const ADMIN_EMAIL = "piyush.bhatt007@gmail.com";
+  const ADMIN_MOBILE = "9636049901";
+
+  // Expose Firebase Auth operations used by the Admin panel.
+  window.EverestFirebase = {
+    adminEmail: ADMIN_EMAIL,
+    adminMobile: ADMIN_MOBILE,
+    adminLogin: async (email, password) => {
+      if (email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        throw new Error("This email is not the registered Admin email.");
+      }
+      return await signInWithEmailAndPassword(auth, email.trim(), password);
+    },
+    sendAdminPasswordReset: async () => {
+      return await sendPasswordResetEmail(auth, ADMIN_EMAIL);
+    },
+    changeAdminPassword: async (newPassword) => {
+      if (!auth.currentUser) throw new Error("Admin is not signed in.");
+      return await updatePassword(auth.currentUser, newPassword);
+    },
+    adminSignOut: async () => {
+      return await signOut(auth);
+    },
+    onAdminAuthChanged: (callback) => onAuthStateChanged(auth, callback),
+
+    saveTestResult: async (result) => {
+      const payload = {
+        ...result,
+        submittedAt: serverTimestamp(),
+        source: "EVEREST IT STUDENT APP"
+      };
+      return await addDoc(collection(firestore, "testResults"), payload);
+    },
+
+    getTestResults: async () => {
+      const snap = await getDocs(collection(firestore, "testResults"));
+      return snap.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+    }
+  };
+</script>
+<script>
         const ICONS = {
             home: '<svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
             courses: '<svg class="icon" viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>',
@@ -1419,7 +1674,44 @@
                     { q: "राजस्थान में 'जन आधार' कार्ड का क्या उपयोग है?", options: ["सरकारी योजनाओं का लाभ", "सिर्फ पहचान", "सिर्फ बैंक खाता", "कोई नहीं"], a: 0 },
                     { q: "क्या हमें सोशल मीडिया पर निजी जानकारी शेयर करनी चाहिए?", options: ["सावधानी से, सीमित मात्रा में", "हाँ, सब कुछ", "बिल्कुल नहीं", "पता नहीं"], a: 0 },
                     { q: "आईटी (IT) का भविष्य क्या है?", options: ["Artificial Intelligence (AI)", "Cloud Computing", "IoT", "उपरोक्त सभी"], a: 3 }
-                ]}
+                ]},
+                { id: 'today-lesson1', title: 'LESSON 1 – INTRODUCTION TO COMPUTER', enabled: true, isToday: true, questions: [
+                    { q: "निम्न में कौन कंप्यूटर सिस्टम का आवश्यक कंपोनेंट नहीं है?", options: ["हार्डवेयर", "सॉफ्टवेयर", "बिजली", "यूजर"], a: 2 },
+                    { q: "निम्न में कौन डेटा का एक प्रकार है?", options: ["केवल असंसाधित तथ्य", "टेक्स्ट, इमेज", "ऑडियो व वीडियो", "उपरोक्त सभी"], a: 3 },
+                    { q: "डेटा को मुख्यतः बाइनरी फॉर्मेट में स्टोर किया जाता है, जो ______ होते हैं।", options: ["2 चिन्ह (0,1)", "8 चिन्ह (0-7)", "10 चिन्ह (0-9)", "16 चिन्ह (0-9, A-F)"], a: 0 },
+                    { q: "निम्न में कौनसा कथन सत्य है?", options: ["एक Byte 8 बिट के बराबर होता है", "दशमलव संख्या का आधार 10 होता है", "ASCII कोड में प्रत्येक कैरेक्टर 8 बिट का होता है", "उपरोक्त सभी"], a: 3 },
+                    { q: "निम्न में कौन सूचनाओं का समूह है?", options: ["डेटा", "रिकॉर्ड", "फाइल", "उपरोक्त सभी"], a: 3 },
+                    { q: "किसे कंप्यूटर का जनक के नाम से जाना जाता है?", options: ["बिल गेट्स", "चार्ल्स बैबेज", "स्टीव जॉब्स", "लेडी लारा"], a: 1 },
+                    { q: "निम्न में कौन कंप्यूटर सिस्टम की एक विशेषता नहीं है?", options: ["गति (Speed)", "शुद्धता (Accuracy)", "विविधता (Versatility)", "बुद्धि का अभाव (Lack of IQ)"], a: 3 },
+                    { q: "कंप्यूटर वर्गीकरण के आधार पर कौन कंप्यूटर का एक प्रकार नहीं है?", options: ["एनालॉग कंप्यूटर", "हाइब्रिड कंप्यूटर", "डिजिटल कंप्यूटर", "मैट्रिक्स कंप्यूटर"], a: 0 },
+                    { q: "कौन आकार, भंडारण और क्षमता के आधार पर डिजिटल कंप्यूटर का एक प्रकार है?", options: ["सुपर कंप्यूटर", "मिनी या माइक्रो कंप्यूटर", "माइक्रो कंप्यूटर", "उपरोक्त सभी"], a: 3 },
+                    { q: "हैंडहेल्ड कंप्यूटर छोटा व पोर्टेबल कंप्यूटिंग उपकरण है जिसे आप अपने हाथ में पकड़ सकते हैं। निम्न में कौन हैंडहेल्ड कंप्यूटर का उदाहरण है?", options: ["PDAs", "स्मार्टफोन", "टैबलेट पीसी", "उपरोक्त सभी"], a: 3 },
+                    { q: "निम्न में कौन माइक्रो-कंप्यूटर का एक उदाहरण है?", options: ["डेस्कटॉप और लैपटॉप", "नेटबुक और PDAs", "स्मार्टफोन और टैबलेट्स", "उपरोक्त सभी"], a: 3 },
+                    { q: "निम्न में कौन डेटा प्रोसेसिंग के मामले में सबसे शक्तिशाली कंप्यूटर है जिसका उपयोग अंतरिक्ष यान व सैटेलाइट को कंट्रोल करने के लिए किया जाता है?", options: ["माइक्रो कंप्यूटर", "सुपर कंप्यूटर", "मिनी कंप्यूटर", "मेनफ्रेम कंप्यूटर"], a: 1 },
+                    { q: "निम्न में कौन सुपर कंप्यूटर का एक प्रकार है?", options: ["IBM's Sequoia in USA", "FUJITSU'S K in Japan", "PARAM in India", "All of the above"], a: 3 },
+                    { q: "निम्न में कौन भारत का सबसे तेज और सबसे तेज डाटा हाई स्पीड सुपर कंप्यूटर है?", options: ["PARAM Shivay", "PARAM Rudra", "AIRAWAT (PSAI)", "PARAM Siddhi"], a: 2 },
+                    { q: "यह एक फ्लैट सर्किट बोर्ड है जो RAM, ROM, CPU, मेमोरी और अन्य पेरीफेरल उपकरणों को जोड़ता है और संपूर्ण सिस्टम में संचार का माध्यम होता है।", options: ["हार्ड डिस्क", "फ्लॉपी डिस्क", "मदरबोर्ड", "उपरोक्त सभी"], a: 2 },
+                    { q: "PC में संचार के लिए बस लाइन का उपयोग किया जाता है। एक Parallel संचार में एक समय में अधिकतम कितने सूचना संकेतित होते हैं?", options: ["8 बिट्स", "1 बिट्स", "8 बाइट", "4 बिट्स"], a: 0 },
+                    { q: "कंप्यूटर में कौन सा उपकरण AC विद्युत को विद्युत में परिवर्तित करता है?", options: ["POST", "Adapter", "CMOS", "RAM"], a: 2 },
+                    { q: "निम्न में कौनसा कथन प्रोसेसर से संबंधित है?", options: ["प्रोसेसर सिलिकॉन से बना होता है", "Intel, Core प्रोसेसर के प्रकार हैं", "प्रोसेसर में ट्रांजिस्टर होते हैं", "उपरोक्त सभी"], a: 3 },
+                    { q: "निम्न में कौनसा कथन सत्य है?", options: ["ALU और CU माइक्रोप्रोसेसर (CPU) के कंपोनेंट्स हैं", "CPU को कंप्यूटर का 'मस्तिष्क' माना जाता है", "CPU की गति Hz, GHz में मापी जाती है", "उपरोक्त सभी सत्य हैं"], a: 3 },
+                    { q: "सॉफ्टवेयर दो प्रकार का होता है, एक सिस्टम सॉफ्टवेयर और दूसरा एप्लिकेशन सॉफ्टवेयर। निम्न में कौन सिस्टम सॉफ्टवेयर नहीं है?", options: ["माइक्रोसॉफ्ट वर्ड", "ऑपरेटिंग सिस्टम", "डिवाइस ड्राइवर", "यूटिलिटीज टूल्स"], a: 0 },
+                    { q: "निम्न में कौन एप्लिकेशन सॉफ्टवेयर का एक प्रकार नहीं है?", options: ["वेब ब्राउजर", "बैंकिंग सॉफ्टवेयर", "डिवाइस ड्राइवर", "वर्ड प्रोसेसर"], a: 2 },
+                    { q: "निम्न में असत्य कथन का चयन करें।", options: ["सॉफ्टवेयर प्रोग्राम का समूह होता है", "डेटा त्रुटि को बग कहा जाता है", "ऑपरेटिंग सिस्टम एक हार्डवेयर है", "उपरोक्त सभी असत्य हैं"], a: 2 },
+                    { q: "निम्न में से कौनसी प्रोग्रामिंग भाषा नहीं है?", options: ["C", "Java", "Microsoft Office", "Pascal"], a: 2 },
+                    { q: "निम्न में कौन हार्डवेयर नहीं है?", options: ["Windows 11", "Keyboard, Mouse, CPU", "Hard Disk, Motherboard", "Monitor, Printer, Speaker"], a: 0 },
+                    { q: "आज के समय में कंप्यूटर का उपयोग किया जाता है।", options: ["शिक्षा, चिकित्सा, अनुसंधान", "प्रशासन, परिवहन, रेलवे, बैंक", "संचार, व्यापार, मनोरंजन, घर", "उपरोक्त सभी"], a: 3 },
+                    { q: "घर में कंप्यूटर का उपयोग किया जा सकता है।", options: ["सोशल मीडिया, ई-मेल व इंटरनेट का उपयोग करने के लिए", "बच्चों के स्कूल से संबंधित होमवर्क व प्रोजेक्ट वर्क के लिए", "मनोरंजन, ज्ञान व खेलने के लिए", "उपरोक्त सभी"], a: 3 },
+                    { q: "व्यापार में कंप्यूटर का उपयोग किया जा सकता है।", options: ["संचार, शिक्षा एवं ट्रेनिंग", "सेल्स और मार्केटिंग", "एकाउंट और फाइनेंस", "उपरोक्त सभी"], a: 3 },
+                    { q: "शिक्षा में कंप्यूटर का उपयोग किया जा सकता है।", options: ["स्मार्ट क्लासेस व डिजिटल लाइब्रेरी", "ऑनलाइन शिक्षा", "रिसर्च व प्रोजेक्ट", "उपरोक्त सभी"], a: 3 },
+                    { q: "चिकित्सा व स्वास्थ्य सेवा में कंप्यूटर का उपयोग किया जा सकता है।", options: ["हॉस्पिटल प्रबंधन में", "मेडिकल लेब व सर्जरी में", "डायग्नोस्टिक में", "उपरोक्त सभी"], a: 3 },
+                    { q: "निम्न में कौन असेंबली भाषा को मशीन भाषा में बदलता है?", options: ["कम्पाइलर", "इंटरप्रेटर", "असेंबलर", "कम्प्यूटर"], a: 2 },
+                    { q: "कंप्यूटर में वर्णमाला, संख्यात्मक और विराम चिन्ह को इलेक्ट्रॉनिक डेटा में प्रदर्शित करने के लिए सबसे अधिक किस कोड का उपयोग किया जाता है?", options: ["ASCII", "BCD", "ANSI", "USCII"], a: 0 },
+                    { q: "निम्न में कौन अंतरराष्ट्रीय भाषाओं (जैसे चीनी, जापानी, हिन्दी) को बाइनरी कोडिंग में बदलने के लिए इस्तेमाल की जाने वाली एक प्रणाली है?", options: ["UNICODE", "EBCDIC", "UNINODE", "EBCDIC 2.0"], a: 0 },
+                    { q: "जब कंप्यूटर स्टार्ट किया जाता है तो कौन हार्डवेयर उपकरणों की जाँच करता है?", options: ["POST", "CMOS", "DMOS", "RIP"], a: 0 },
+                    { q: "निम्न में कौनसा कम्प्रेशन प्रोग्राम नहीं है?", options: ["WinZip", "PKZip", "WinRAR", "RAID"], a: 3 },
+                    { q: "VGA केबल में कितने पिन होते हैं?", options: ["11", "14", "15", "17"], a: 2 },
+                ]},
             ],
             'RS-CFA': [
                 { id: 'cfa1', title: 'Chapter 1: Tally Prime का परिचय + Basic Accounting', enabled: true, questions: [
@@ -2212,6 +2504,10 @@
             testState: { activeTest: null, currentQ: 0, answers: {}, submitted: false, results: null },
             lastResult: null,
             adminSearch: '',
+            onlineResults: [],
+            onlineResultsLoading: false,
+            onlineResultsError: '',
+            selectedOnlineResult: null,
             modal: null,
             notePage: 0,
             activeHandwrittenChapter: null,
@@ -2221,6 +2517,18 @@
                 typing: false
             }
         };
+
+        // Keep Admin session synced with Firebase Authentication.
+        if (window.EverestFirebase?.onAdminAuthChanged) {
+            window.EverestFirebase.onAdminAuthChanged((user) => {
+                appState.isAdmin = !!user && user.email?.toLowerCase() === "piyush.bhatt007@gmail.com";
+                appState.adminEmail = user?.email || "";
+                if (!appState.isAdmin && appState.activeTab?.startsWith('admin') && appState.activeTab !== 'adminLogin') {
+                    appState.activeTab = 'adminLogin';
+                    render();
+                }
+            });
+        }
 
         const HANDWRITTEN_NOTES = {
             "rs-cit": [
@@ -2300,8 +2608,15 @@
             mockTests: JSON.parse(localStorage.getItem('eit_mockTests')) || DEFAULT_MOCK_TESTS,
             results: JSON.parse(localStorage.getItem('eit_results')) || [],
             notices: JSON.parse(localStorage.getItem('eit_notices')) || [{ id: 1, text: "नया RS-CIT बैच 15 तारीख से शुरू हो रहा है। आज ही Admission लें!", date: "2026-08-20" }],
-            adminPassword: localStorage.getItem('eit_admin_pass') || 'admin123'
+            adminPassword: localStorage.getItem('eit_admin_pass') || 'Everest&777'
         };
+
+        // Admin password migration for this app version. If an older local password
+        // is still stored in this browser, use the owner's chosen password.
+        if (localStorage.getItem('eit_admin_pass') === 'admin123') {
+            db.adminPassword = 'Everest&777';
+            localStorage.setItem('eit_admin_pass', db.adminPassword);
+        }
 
         window.actions = {
             saveDb: () => {
@@ -2362,6 +2677,9 @@
                     appState.activeTab = 'adminLogin';
                 } else {
                     appState.activeTab = tab;
+                    if ((tab === 'adminResults' || tab === 'adminDashboard') && appState.isAdmin) {
+                        setTimeout(() => actions.loadOnlineResults(), 0);
+                    }
                     if(params && params.course !== undefined) appState.activeCourse = params.course;
                     if(params && params.chapter !== undefined) appState.activeChapter = params.chapter;
                     if(params && params.handwrittenChapter !== undefined) appState.activeHandwrittenChapter = params.handwrittenChapter;
@@ -2385,22 +2703,217 @@
                 if (user) { appState.currentUser = user; actions.setTab('studentDashboard'); }
                 else { alert("Invalid Credentials"); }
             },
-            adminLogin: (e) => {
+            adminLogin: async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('adminUser').value;
-                const pass = document.getElementById('adminPass').value;
-                if(user === 'admin' && pass === db.adminPassword) {
+                const email = document.getElementById('adminEmail')?.value?.trim() || "";
+                const pass = document.getElementById('adminPass')?.value || "";
+                try {
+                    await window.EverestFirebase.adminLogin(email, pass);
                     appState.isAdmin = true;
+                    appState.adminEmail = email;
                     actions.setTab('adminDashboard');
-                } else {
-                    alert("Incorrect Admin Credentials");
+                } catch (err) {
+                    console.error(err);
+                    const code = err?.code || "";
+                    if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+                        alert("❌ Email या Password गलत है। Firebase Authentication में Admin account check करें।");
+                    } else if (code === "auth/operation-not-allowed") {
+                        alert("⚠️ Firebase में Email/Password Sign-in अभी Enable नहीं है। Firebase Console → Authentication → Sign-in method में Email/Password ON करें।");
+                    } else {
+                        alert("❌ Admin Login नहीं हुआ: " + (err?.message || "Unknown error"));
+                    }
                 }
             },
-            logout: () => {
+            forgotAdminPassword: async () => {
+                try {
+                    if (!window.EverestFirebase?.sendAdminPasswordReset) {
+                        throw new Error("Firebase Authentication अभी load नहीं हुआ। कृपया 2-3 सेकंड बाद फिर Try करें या app को Ctrl+F5 से refresh करें।");
+                    }
+                    await window.EverestFirebase.sendAdminPasswordReset();
+                    alert("✅ Password reset link आपके Admin Email पर भेज दिया गया है:\n" + window.EverestFirebase.adminEmail);
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ Reset email नहीं भेजा गया: " + (err?.message || "Unknown error"));
+                }
+            },
+            logout: async () => {
+                if (appState.isAdmin && window.EverestFirebase?.adminSignOut) {
+                    try { await window.EverestFirebase.adminSignOut(); } catch (e) { console.error(e); }
+                }
                 appState.currentUser = null;
                 appState.isAdmin = false;
                 appState.lastResult = null;
                 actions.setTab('home');
+            },
+
+            loadOnlineResults: async () => {
+                if (!appState.isAdmin) return;
+                appState.onlineResultsLoading = true;
+                appState.onlineResultsError = '';
+                render();
+                try {
+                    const rows = await window.EverestFirebase.getTestResults();
+                    appState.onlineResults = rows.sort((a, b) => {
+                        const da = a.submittedAt?.seconds ? a.submittedAt.seconds : (Date.parse(a.date || '') || 0) / 1000;
+                        const dbb = b.submittedAt?.seconds ? b.submittedAt.seconds : (Date.parse(b.date || '') || 0) / 1000;
+                        return dbb - da;
+                    });
+                } catch (err) {
+                    console.error("Firebase online results load failed:", err);
+                    appState.onlineResultsError = "Online results load नहीं हो पाए। Firestore Rules/Internet check करें।";
+                } finally {
+                    appState.onlineResultsLoading = false;
+                    render();
+                }
+            },
+            copyTodayResults: async () => {
+                if (!appState.isAdmin) return;
+
+                const results = Array.isArray(appState.onlineResults) ? appState.onlineResults : [];
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                const todayKey = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+
+                const getResultDate = (r) => {
+                    if (r?.submittedAt?.seconds) return new Date(r.submittedAt.seconds * 1000);
+                    if (r?.submittedAt?.toDate) return r.submittedAt.toDate();
+                    if (r?.date) {
+                        const d = new Date(r.date);
+                        if (!Number.isNaN(d.getTime())) return d;
+                    }
+                    return null;
+                };
+
+                const todayRows = results.filter(r => {
+                    const d = getResultDate(r);
+                    if (!d) return false;
+                    const key = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                    return key === todayKey;
+                });
+
+                if (!todayRows.length) {
+                    alert("आज का कोई result नहीं मिला। पहले Results को Refresh करें।");
+                    return;
+                }
+
+                const sorted = [...todayRows].sort((a, b) => {
+                    const da = getResultDate(a)?.getTime() || 0;
+                    const dbb = getResultDate(b)?.getTime() || 0;
+                    return da - dbb;
+                });
+
+                const testTitle = sorted[0]?.testTitle || "TODAY TEST";
+                const passCount = sorted.filter(r => r.pass === true).length;
+                const failCount = sorted.length - passCount;
+                const avg = Math.round(
+                    sorted.reduce((sum, r) => sum + Number(r.percentage || 0), 0) / sorted.length
+                );
+
+                const dateText = `${pad(now.getDate())}-${pad(now.getMonth()+1)}-${now.getFullYear()}`;
+
+                const lines = [
+                    "📊 EVEREST IT DAILY TEST",
+                    `📚 ${testTitle}`,
+                    `📅 ${dateText}`,
+                    "",
+                    ...sorted.map((r, i) => {
+                        const name = String(r.studentName || "Unknown Student").trim().toUpperCase();
+                        const score = `${Number(r.correct || r.score || 0)}/${Number(r.total || 0)}`;
+                        const pct = Number(r.percentage || 0);
+                        const icon = r.pass === true ? "✅" : "❌";
+                        return `${i + 1}. ${name} — ${score} — ${pct}% ${icon}`;
+                    }),
+                    "",
+                    `👥 TOTAL STUDENTS: ${sorted.length}`,
+                    `✅ PASS: ${passCount}`,
+                    `❌ FAIL: ${failCount}`,
+                    `📈 AVERAGE: ${avg}%`,
+                    "",
+                    "EVEREST IT ज्ञान केंद्र, खेरवाड़ा"
+                ];
+
+                const text = lines.join("\n");
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    alert("✅ आज का पूरा Result Copy हो गया!\nअब WhatsApp Group में Paste कर सकते हैं।");
+                } catch (err) {
+                    const ta = document.createElement("textarea");
+                    ta.value = text;
+                    ta.style.position = "fixed";
+                    ta.style.left = "-9999px";
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    try {
+                        document.execCommand("copy");
+                        alert("✅ आज का पूरा Result Copy हो गया!\nअब WhatsApp Group में Paste कर सकते हैं।");
+                    } catch (copyErr) {
+                        alert("Result copy नहीं हो पाया। नीचे के results को manually copy करें।");
+                    }
+                    ta.remove();
+                }
+            },
+            viewOnlineAnswerSheet: (idx) => {
+                const rows = Array.isArray(appState.onlineResults) ? appState.onlineResults : [];
+                appState.selectedOnlineResult = rows[idx] || null;
+                appState.activeTab = 'adminAnswerSheet';
+                window.scrollTo(0, 0);
+                render();
+            },
+            backFromOnlineAnswerSheet: () => {
+                appState.selectedOnlineResult = null;
+                appState.activeTab = 'adminResults';
+                window.scrollTo(0, 0);
+                render();
+            },
+            copyAnswerKey: async () => {
+                const todayTest = db.mockTests['RS-CIT'].find(t => t.id === 'today-lesson1');
+                if (!todayTest || !Array.isArray(todayTest.questions)) {
+                    alert("आज का Test/Answer Key उपलब्ध नहीं है।");
+                    return;
+                }
+
+                const answers = todayTest.questions.map(q => String.fromCharCode(65 + Number(q.a)));
+                const lines = [
+                    "📝 EVEREST IT DAILY TEST – ANSWER KEY",
+                    `📚 ${todayTest.title}`,
+                    `📅 ${new Date().toLocaleDateString('en-IN')}`,
+                    "",
+                    ...answers.map((a, i) => `${i + 1}. ${a}`),
+                    "",
+                    "EVEREST IT ज्ञान केंद्र, खेरवाड़ा"
+                ];
+                const text = lines.join("\n");
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    alert("✅ Answer Key Copy हो गई!\nअब WhatsApp Group में Paste कर सकते हैं।");
+                } catch (err) {
+                    const ta = document.createElement("textarea");
+                    ta.value = text;
+                    ta.style.position = "fixed";
+                    ta.style.left = "-9999px";
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    try {
+                        document.execCommand("copy");
+                        alert("✅ Answer Key Copy हो गई!\nअब WhatsApp Group में Paste कर सकते हैं।");
+                    } catch (copyErr) {
+                        alert("Answer Key copy नहीं हो पाई।");
+                    }
+                    ta.remove();
+                }
+            },
+
+            startTodayTest: () => {
+                const name = prompt("आज के Test के लिए अपना पूरा नाम लिखें:");
+                if(!name || !name.trim()) { alert("कृपया अपना नाम लिखें।"); return; }
+                appState.currentUser = { name: name.trim() };
+                const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson1');
+                if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
+                actions.startTest('RS-CIT', idx);
             },
             startTest: (cat, idx) => {
                 appState.testState = { activeTest: db.mockTests[cat][idx], currentQ: 0, answers: {}, submitted: false, results: null };
@@ -2470,13 +2983,32 @@
                 let qs = s.activeTest.questions;
                 let correct = 0;
                 let attempted = 0;
+                const answerDetails = [];
+
                 qs.forEach((q, i) => {
-                    if(s.answers[i] !== undefined) {
+                    const selected = s.answers[i];
+                    const isAttempted = selected !== undefined && selected !== null;
+                    if(isAttempted) {
                         attempted++;
-                        if(s.answers[i] === q.a) correct++;
+                        if(selected === q.a) correct++;
                     }
+
+                    answerDetails.push({
+                        no: i + 1,
+                        question: q.q,
+                        options: q.options,
+                        selectedIndex: isAttempted ? selected : null,
+                        selectedLetter: isAttempted ? String.fromCharCode(65 + selected) : null,
+                        selectedText: isAttempted ? q.options[selected] : null,
+                        correctIndex: q.a,
+                        correctLetter: String.fromCharCode(65 + q.a),
+                        correctText: q.options[q.a],
+                        isCorrect: isAttempted && selected === q.a
+                    });
                 });
+
                 let wrong = attempted - correct;
+                let unattempted = qs.length - attempted;
                 let pct = Math.round((correct / qs.length) * 100);
                 let result = {
                     id: Date.now(),
@@ -2487,12 +3019,22 @@
                     attempted: attempted,
                     correct: correct,
                     wrong: wrong,
+                    unattempted: unattempted,
                     score: correct,
                     percentage: pct,
-                    pass: pct >= (db.settings.testSettings.passingPct || 40)
+                    pass: pct >= (db.settings.testSettings.passingPct || 40),
+                    answerDetails: answerDetails
                 };
                 db.results.push(result);
                 actions.saveDb();
+
+                // Save the result online in Firebase as well as locally.
+                if (window.EverestFirebase?.saveTestResult) {
+                    window.EverestFirebase.saveTestResult(result).catch((err) => {
+                        console.error("Firebase result save failed:", err);
+                    });
+                }
+
                 appState.testState.results = result;
                 appState.testState.submitted = true;
                 appState.lastResult = result;
@@ -2593,14 +3135,25 @@
                     location.reload();
                 }
             },
-            changeAdminPass: (e) => {
+            changeAdminPass: async (e) => {
                 e.preventDefault();
                 const newPass = document.getElementById('newAdminPass').value;
-                if(newPass.length < 4) return alert("Password too short");
-                db.adminPassword = newPass;
-                actions.saveDb();
-                alert("Admin password changed successfully");
-                actions.closeModal();
+                if(newPass.length < 6) return alert("Password कम से कम 6 characters का होना चाहिए।");
+                try {
+                    await window.EverestFirebase.changeAdminPassword(newPass);
+                    alert("✅ Firebase Admin Password successfully changed.");
+                    actions.closeModal();
+                } catch (err) {
+                    console.error(err);
+                    if (err?.code === "auth/requires-recent-login") {
+                        alert("⚠️ Security के लिए फिर से Admin Login करें, फिर password बदलें।");
+                        await window.EverestFirebase.adminSignOut();
+                        appState.isAdmin = false;
+                        actions.setTab('adminLogin');
+                    } else {
+                        alert("❌ Password change नहीं हुआ: " + (err?.message || "Unknown error"));
+                    }
+                }
             },
 
             // EVEREST AI Actions
@@ -2820,6 +3373,16 @@
             home: () => `
                 <div class="p-4 fade-in space-y-5">
                     <div class="custom-marquee"><div class="marquee-content">🏆 2009 से 15 हजार से भी अधिक RS-CIT पास छात्र, छात्रों के विश्वास के साथ खेरवाड़ा का एक अग्रणी संस्थान &nbsp;&nbsp;&nbsp; 📢 EVEREST IT ज्ञान केंद्र, खेरवाड़ा में आपका स्वागत है। &nbsp;&nbsp;&nbsp; 📢 नया RS-CIT बैच 15 तारीख से शुरू हो रहा है। आज ही Admission लें!</div></div>
+                    <!-- TODAY'S DAILY TEST -->
+                    <div class="today-test-card">
+                        <div class="today-test-badge">📢 TODAY TEST</div>
+                        <h2>आज का टेस्ट जरूर दें!</h2>
+                        <p>चेक करें अपना <b>Computer ज्ञान</b> 💻🧠</p>
+                        <div class="today-test-title">LESSON 1 – INTRODUCTION TO COMPUTER</div>
+                        <div class="today-test-meta">📝 35 Important Questions &nbsp; • &nbsp; 🎯 RS-CIT Exam Practice</div>
+                        <button onclick="actions.startTodayTest()" class="today-test-btn">🚀 START TODAY TEST ${ICONS.arrowRight}</button>
+                    </div>
+
                     <div class="slider-container shadow-lg"><div class="slider-track"><div class="slide"><img src="${IMAGES.poster1}" alt="Poster 1"></div><div class="slide"><img src="${IMAGES.poster2}" alt="Poster 2"></div></div></div>
 
                     <div class="bg-white rounded-3xl p-6 border shadow-sm space-y-4">
@@ -3597,32 +4160,88 @@ ${db.courses.map(c => `
                 `;
             },
 
-            resultScreen: (r) => `
-                <div class="p-6 fade-in text-center">
-                    <div class="bg-white p-8 rounded-3xl border shadow-xl mb-6">
-                        <h2 class="text-2xl font-black mb-1">${r.pass ? 'CONGRATULATIONS!' : 'KEEP PRACTICING!'}</h2>
-                        <p class="text-sm font-bold text-gray-500 mb-6 uppercase tracking-widest">${r.pass ? 'You Passed the Test' : 'Test Completed'}</p>
+            resultScreen: (r) => {
+                const details = Array.isArray(r.answerDetails) ? r.answerDetails : [];
+                const wrongCount = details.filter(d => d && !d.isCorrect && d.selectedIndex !== null).length;
+                const skippedCount = details.filter(d => d && d.selectedIndex === null).length;
 
-                        <div class="text-6xl font-black ${r.pass ? 'text-green-500':'text-red-500'} mb-2">${r.percentage}%</div>
-                        <div class="text-sm font-black uppercase mb-8">${r.pass ? 'PASS':'FAIL'}</div>
+                return `
+                <div class="p-4 fade-in pb-32">
+                    <div class="everest-result-hero">
+                        <div class="text-5xl mb-2">${r.pass ? '🎉' : '📚'}</div>
+                        <h2 class="text-2xl font-black">${r.pass ? 'बहुत बढ़िया!' : 'Test पूरा हो गया!'}</h2>
+                        <p class="text-blue-100 text-xs font-bold mt-1">${String(r.studentName || '').toUpperCase()} • ${r.testTitle}</p>
+                    </div>
 
-                        <div class="grid grid-cols-2 gap-4 text-left text-sm font-bold border-t border-gray-100 pt-6">
-                            <div><p class="text-gray-400 uppercase text-[10px]">कुल प्रश्न</p><p>${r.total}</p></div>
-                            <div><p class="text-gray-400 uppercase text-[10px]">सही उत्तर</p><p class="text-green-600">${r.correct}</p></div>
-                            <div><p class="text-gray-400 uppercase text-[10px]">गलत उत्तर</p><p class="text-red-600">${r.wrong}</p></div>
-                            <div><p class="text-gray-400 uppercase text-[10px]">प्राप्त अंक</p><p>${r.correct}</p></div>
-                            <div><p class="text-gray-400 uppercase text-[10px]">प्रतिशत</p><p>${r.percentage}%</p></div>
-                            <div><p class="text-gray-400 uppercase text-[10px]">परीक्षा परिणाम</p><p class="${r.pass?'text-green-600':'text-red-600'}">${r.pass?'सफल (PASS)':'असफल (FAIL)'}</p></div>
-                            <div class="col-span-2 mt-2"><p class="text-gray-400 uppercase text-[10px]">Test Name</p><p class="truncate text-xs">${r.testTitle}</p></div>
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <div class="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-black text-green-600">${r.correct}</div>
+                            <div class="text-[10px] font-black text-green-800 uppercase">सही</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-black text-red-600">${r.wrong}</div>
+                            <div class="text-[10px] font-black text-red-800 uppercase">गलत</div>
+                        </div>
+                        <div class="bg-gray-50 border rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-black text-gray-600">${r.unattempted || 0}</div>
+                            <div class="text-[10px] font-black text-gray-500 uppercase">छोड़े</div>
+                        </div>
+                        <div class="${r.pass ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} border rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-black ${r.pass ? 'text-green-600' : 'text-red-600'}">${r.percentage}%</div>
+                            <div class="text-[10px] font-black uppercase ${r.pass ? 'text-green-800' : 'text-red-800'}">${r.pass ? 'PASS' : 'FAIL'}</div>
                         </div>
                     </div>
+
+                    <div class="bg-white rounded-3xl border shadow-sm p-5 mb-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="font-black text-lg">📝 आपकी Answer Sheet</h3>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">कौन-सा answer गलत हुआ और सही answer क्या था</p>
+                            </div>
+                            <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-[10px] font-black">${r.correct}/${r.total}</span>
+                        </div>
+
+                        ${details.length ? `
+                            <div class="space-y-3">
+                                ${details.map(d => `
+                                    <div class="rounded-2xl border p-4 ${d.isCorrect ? 'bg-green-50 border-green-200' : (d.selectedIndex === null ? 'bg-gray-50 border-gray-200' : 'bg-red-50 border-red-200')}">
+                                        <div class="flex items-start gap-2">
+                                            <span class="w-7 h-7 shrink-0 rounded-full ${d.isCorrect ? 'bg-green-600' : (d.selectedIndex === null ? 'bg-gray-400' : 'bg-red-600')} text-white flex items-center justify-center text-[10px] font-black">${d.no}</span>
+                                            <p class="text-sm font-black text-gray-800 leading-5">${d.question}</p>
+                                        </div>
+                                        <div class="mt-3 grid gap-2">
+                                            <div class="rounded-xl bg-white/80 p-3">
+                                                <div class="text-[9px] font-black text-gray-400 uppercase">आपका उत्तर</div>
+                                                <div class="text-xs font-black ${d.isCorrect ? 'text-green-700' : 'text-red-700'}">
+                                                    ${d.selectedIndex === null ? '⬜ उत्तर नहीं दिया' : `${d.selectedLetter}. ${d.selectedText} ${d.isCorrect ? '✅' : '❌'}`}
+                                                </div>
+                                            </div>
+                                            ${!d.isCorrect ? `
+                                                <div class="rounded-xl bg-white/80 p-3">
+                                                    <div class="text-[9px] font-black text-gray-400 uppercase">सही उत्तर</div>
+                                                    <div class="text-xs font-black text-green-700">✅ ${d.correctLetter}. ${d.correctText}</div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center">
+                                <p class="text-sm font-black text-yellow-800">इस पुराने result में Answer Sheet का data save नहीं है।</p>
+                                <p class="text-[10px] text-yellow-700 mt-1">नए test submission में पूरा answer review उपलब्ध रहेगा।</p>
+                            </div>
+                        `}
+                    </div>
+
                     <div class="space-y-3">
-                        <button onclick="actions.startTest('${appState.activeCourse === 'rs-cit' ? 'RS-CIT' : (appState.activeCourse === 'rs-cfa' ? 'RS-CFA' : 'AI')}', db.mockTests['${appState.activeCourse === 'rs-cit' ? 'RS-CIT' : (appState.activeCourse === 'rs-cfa' ? 'RS-CFA' : 'AI')}'].findIndex(t=>t.title==='${r.testTitle}'))" class="w-full py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg uppercase tracking-wider">Retry Mock Test</button>
-                        <button onclick="actions.setTab('mocktest', {course: '${appState.activeCourse}'})" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-wider">Back to Mock Tests</button>
-                        <button onclick="actions.setTab('home')" class="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-black uppercase tracking-wider">Back to Home</button>
+                        <button onclick="actions.startTest('${appState.activeCourse === 'rs-cit' ? 'RS-CIT' : (appState.activeCourse === 'rs-cfa' ? 'RS-CFA' : 'AI')}', db.mockTests['${appState.activeCourse === 'rs-cit' ? 'RS-CIT' : (appState.activeCourse === 'rs-cfa' ? 'RS-CFA' : 'AI')}'].findIndex(t=>t.title==='${r.testTitle}'))" class="w-full py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg">🔁 RETRY TEST</button>
+                        <button onclick="actions.setTab('mocktest', {course: '${appState.activeCourse}'})" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-black">BACK TO MOCK TESTS</button>
+                        <button onclick="actions.setTab('home')" class="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-black">🏠 HOME</button>
                     </div>
                 </div>
-            `,
+                `;
+            },
 
             contact: () => `
                 <div class="p-4 fade-in text-center pb-32">
@@ -3727,9 +4346,22 @@ ${db.courses.map(c => `
             `,
 
             studentLogin: () => `
-                <div class="p-4 fade-in mt-10">
-                    <div class="bg-white rounded-3xl shadow-xl p-8 border">
-                        <h2 class="font-black text-2xl mb-8 text-center">Student Login</h2>
+                <div class="p-4 fade-in mt-6">
+                    <div class="everest-login-card">
+                        <div class="everest-login-brandbar">
+                            <div class="everest-login-brand-logo"><img src="${IMAGES.logo}" alt="EVEREST IT Logo" /></div>
+                            <div class="everest-login-brand-text">
+                                <div class="everest-login-brand-name">EVEREST IT ज्ञान केंद्र</div>
+                                <div class="everest-login-brand-place">खेरवाड़ा</div>
+                            </div>
+                            <div class="everest-login-brand-icon">🎓</div>
+                        </div>
+                        <div class="everest-login-heading">
+                            <div class="everest-login-round-icon">🎓</div>
+                            <h2>Student Login</h2>
+                            <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
+                            <div class="everest-login-tagline">अपनी तैयारी को दें नई दिशा 🚀</div>
+                        </div>
                         <form onsubmit="actions.login(event)" class="space-y-5">
                             <div class="input-group">
                                 <label class="text-[10px] font-black text-gray-500 uppercase">Student ID</label>
@@ -3739,34 +4371,52 @@ ${db.courses.map(c => `
                                 <label class="text-[10px] font-black text-gray-500 uppercase">PIN Password</label>
                                 <input id="studentPass" type="password" required class="input-field" placeholder="****" />
                             </div>
-                            <button type="submit" class="w-full bg-brand-600 text-white py-4 rounded-xl font-black text-lg shadow-lg">LOGIN</button>
-                            <button type="button" onclick="actions.setTab('login')" class="w-full py-2 text-gray-400 font-bold text-sm">BACK</button>
+                            <button type="submit" class="everest-login-main-btn">🔓 LOGIN <span>›</span></button>
+                            <button type="button" onclick="actions.setTab('login')" class="everest-login-back-btn">← Back to Home</button>
                         </form>
+                        <div class="everest-login-footer">कंप्यूटर शिक्षा, उज्जवल भविष्य</div>
                     </div>
                 </div>
             `,
 
             adminLogin: () => `
-                <div class="p-4 fade-in mt-10">
-                    <div class="bg-white rounded-3xl shadow-xl p-8 border">
-                        <h2 class="font-black text-2xl mb-8 text-center">Admin Login</h2>
-                        <form onsubmit="actions.adminLogin(event)" class="space-y-5">
+                <div class="p-4 fade-in mt-6">
+                    <div class="everest-login-card">
+                        <div class="everest-login-brandbar">
+                            <div class="everest-login-brand-logo"><img src="${IMAGES.logo}" alt="EVEREST IT Logo" /></div>
+                            <div class="everest-login-brand-text">
+                                <div class="everest-login-brand-name">EVEREST IT ज्ञान केंद्र</div>
+                                <div class="everest-login-brand-place">खेरवाड़ा</div>
+                            </div>
+                            <div class="everest-login-brand-icon">🔐</div>
+                        </div>
+                        <div class="everest-login-heading">
+                            <div class="everest-login-round-icon">🔐</div>
+                            <h2>Admin Login</h2>
+                            <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
+                            <div class="everest-login-tagline">सुरक्षित लॉगिन • अधिकृत उपयोग के लिए</div>
+                        </div>
+                        <form onsubmit="actions.adminLogin(event)" class="space-y-4">
                             <div class="input-group">
-                                <label class="text-[10px] font-black text-gray-500 uppercase">Username</label>
-                                <input id="adminUser" required class="input-field" placeholder="admin" />
+                                <label class="text-[10px] font-black text-gray-500 uppercase">Admin Email</label>
+                                <input id="adminEmail" type="email" required autocomplete="username" value="piyush.bhatt007@gmail.com" class="input-field" placeholder="Admin Email" />
                             </div>
                             <div class="input-group">
                                 <label class="text-[10px] font-black text-gray-500 uppercase">Password</label>
-                                <input id="adminPass" type="password" required class="input-field" placeholder="****" />
+                                <input id="adminPass" type="password" required autocomplete="current-password" class="input-field" placeholder="Firebase Password" />
                             </div>
-                            <button type="submit" class="w-full bg-gray-900 text-white py-4 rounded-xl font-black text-lg shadow-lg">ACCESS DASHBOARD</button>
-                            <button type="button" onclick="actions.setTab('login')" class="w-full py-2 text-gray-400 font-bold text-sm">BACK</button>
+                            <button type="submit" class="everest-login-main-btn">🔓 ACCESS DASHBOARD <span>›</span></button>
+                            <div class="everest-login-secondary-row">
+                                <button type="button" onclick="actions.forgotAdminPassword()" class="everest-login-forgot-btn">🔑 Forgot Password?</button>
+                                <button type="button" onclick="actions.setTab('login')" class="everest-login-small-back">BACK</button>
+                            </div>
                         </form>
+                        <div class="everest-login-footer">कंप्यूटर शिक्षा, उज्जवल भविष्य</div>
                     </div>
                 </div>
             `,
 
-            studentDashboard: () => `
+studentDashboard: () => `
                 <div class="p-4 fade-in space-y-5">
                     <div class="bg-brand-800 text-white rounded-3xl p-6 shadow-xl flex items-center gap-4">
                         <div class="w-16 h-16 bg-white rounded-full p-1"><img src="${IMAGES.logo}" alt="Logo" class="rounded-full" /></div>
@@ -3784,26 +4434,103 @@ ${db.courses.map(c => `
                 </div>
             `,
 
-            adminDashboard: () => `
-                <div class="p-4 fade-in space-y-6">
-                    <div class="bg-gray-900 text-white rounded-3xl p-6 shadow-xl flex justify-between items-center">
-                        <div>
-                            <h2 class="font-black text-xl mb-1">Admin Panel</h2>
-                            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">${db.settings.name}</p>
+            adminDashboard: () => {
+                const rows = Array.isArray(appState.onlineResults) ? appState.onlineResults : [];
+                const total = rows.length;
+                const passCount = rows.filter(r => r.pass === true).length;
+                const failCount = total - passCount;
+                const avg = total ? Math.round(rows.reduce((sum, r) => sum + Number(r.percentage || 0), 0) / total) : 0;
+
+                return `
+                <div class="p-4 fade-in space-y-5 pb-32">
+                    <div class="everest-admin-hero">
+                        <div class="absolute -right-8 -top-8 w-28 h-28 bg-white/10 rounded-full"></div>
+                        <div class="absolute -right-3 bottom-[-35px] w-24 h-24 bg-white/10 rounded-full"></div>
+                        <div class="relative flex justify-between items-start">
+                            <div>
+                                <div class="admin-label mb-3">👑 Administrator</div>
+                                <h2 class="font-black text-2xl">Admin Panel</h2>
+                                <p class="text-xs font-bold mt-1">${db.settings.name}</p>
+                                <p class="admin-sub text-[10px] mt-3">Manage Tests • Students • Results • Answer Key</p>
+                            </div>
+                            <button onclick="actions.logout()" class="admin-logout w-11 h-11 rounded-full flex items-center justify-center">${ICONS.logout}</button>
                         </div>
-                        <button onclick="actions.logout()" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">${ICONS.logout}</button>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="actions.setTab('adminChapters')" class="admin-card"><div class="admin-icon bg-blue-50 text-blue-600">${ICONS.courses}</div><span class="text-xs font-black">Chapters</span></button>
-                        <button onclick="actions.setTab('adminQuestions')" class="admin-card"><div class="admin-icon bg-green-50 text-green-600">${ICONS.study}</div><span class="text-xs font-black">Questions</span></button>
-                        <button onclick="actions.setTab('adminTests')" class="admin-card"><div class="admin-icon bg-purple-50 text-purple-600">${ICONS.test}</div><span class="text-xs font-black">Test Setup</span></button>
-                        <button onclick="actions.setTab('adminResults')" class="admin-card"><div class="admin-icon bg-orange-50 text-orange-600">${ICONS.check}</div><span class="text-xs font-black">Results</span></button>
-                        <button onclick="actions.setTab('adminPdfs')" class="admin-card"><div class="admin-icon bg-red-50 text-red-600">${ICONS.study}</div><span class="text-xs font-black">PDF Manager</span></button>
-                        <button onclick="actions.setTab('adminContact')" class="admin-card"><div class="admin-icon bg-yellow-50 text-yellow-600">${ICONS.contact}</div><span class="text-xs font-black">Contact Info</span></button>
-                        <button onclick="actions.setTab('adminSettings')" class="admin-card col-span-2 flex-row justify-center"><div class="admin-icon bg-gray-100 text-gray-600">${ICONS.settings}</div><span class="text-xs font-black">App Settings</span></button>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-blue-700">${total}</div>
+                            <div class="text-[9px] font-black text-blue-800 uppercase">Online Attempts</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-green-700">${passCount}</div>
+                            <div class="text-[9px] font-black text-green-800 uppercase">Pass</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-red-700">${failCount}</div>
+                            <div class="text-[9px] font-black text-red-800 uppercase">Fail</div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-purple-700">${avg}%</div>
+                            <div class="text-[9px] font-black text-purple-800 uppercase">Average</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border shadow-sm p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="font-black text-lg">⚡ Quick Actions</h3>
+                                <p class="text-[10px] text-gray-400 font-bold">Daily test को जल्दी manage करें</p>
+                            </div>
+                            <span class="text-xl">🚀</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="actions.setTab('adminResults')" class="everest-admin-quick-btn results">
+                                <div class="text-xl mb-2">📊</div>
+                                <div class="quick-title">VIEW RESULTS</div>
+                                <div class="quick-sub">Online student results</div>
+                            </button>
+                            <button onclick="actions.setTab('adminTests')" class="everest-admin-quick-btn setup">
+                                <div class="text-xl mb-2">📝</div>
+                                <div class="quick-title">TEST SETUP</div>
+                                <div class="quick-sub">Time & passing marks</div>
+                            </button>
+                            <button onclick="actions.setTab('adminQuestions')" class="everest-admin-quick-btn questions">
+                                <div class="text-xl mb-2">❓</div>
+                                <div class="quick-title">QUESTION BANK</div>
+                                <div class="quick-sub">Add / edit questions</div>
+                            </button>
+                            <button onclick="actions.copyAnswerKey()" class="everest-admin-quick-btn key">
+                                <div class="text-xl mb-2">🗝️</div>
+                                <div class="quick-title">ANSWER KEY</div>
+                                <div class="quick-sub">Copy for WhatsApp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="actions.setTab('adminChapters')" class="admin-card"><div class="admin-icon bg-blue-50 text-blue-600">${ICONS.courses}</div><span class="text-xs font-black">Chapters</span><small class="text-[9px] text-gray-400 font-bold">Manage Chapters</small></button>
+                        <button onclick="actions.setTab('adminQuestions')" class="admin-card"><div class="admin-icon bg-green-50 text-green-600">${ICONS.study}</div><span class="text-xs font-black">Questions</span><small class="text-[9px] text-gray-400 font-bold">Question Bank</small></button>
+                        <button onclick="actions.setTab('adminTests')" class="admin-card"><div class="admin-icon bg-purple-50 text-purple-600">${ICONS.test}</div><span class="text-xs font-black">Test Setup</span><small class="text-[9px] text-gray-400 font-bold">Daily Test</small></button>
+                        <button onclick="actions.setTab('adminResults')" class="admin-card"><div class="admin-icon bg-orange-50 text-orange-600">${ICONS.check}</div><span class="text-xs font-black">Results</span><small class="text-[9px] text-gray-400 font-bold">Live Results</small></button>
+                        <button onclick="actions.setTab('adminPdfs')" class="admin-card"><div class="admin-icon bg-red-50 text-red-600">${ICONS.study}</div><span class="text-xs font-black">PDF Manager</span><small class="text-[9px] text-gray-400 font-bold">Study PDFs</small></button>
+                        <button onclick="actions.setTab('adminContact')" class="admin-card"><div class="admin-icon bg-yellow-50 text-yellow-600">${ICONS.contact}</div><span class="text-xs font-black">Contact Info</span><small class="text-[9px] text-gray-400 font-bold">Institute Details</small></button>
+                    </div>
+
+                    <button onclick="actions.setTab('adminSettings')" class="w-full bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg">
+                        <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">${ICONS.settings}</div>
+                        <div class="text-left"><div class="text-xs font-black">APP SETTINGS</div><div class="text-[9px] text-gray-400">Password & app information</div></div>
+                    </button>
+
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl p-5 text-center">
+                        <div class="text-xl mb-2">🏆</div>
+                        <p class="font-black text-sm text-blue-900">EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
+                        <p class="text-[10px] text-blue-700 font-bold mt-1">Practice Today • Success Tomorrow! 🚀</p>
                     </div>
                 </div>
-            `,
+                `;
+            },
+
             // ... (All other Admin screens: adminChapters, adminQuestions, adminTests, adminResults, adminPdfs, adminContact, adminSettings preserved as per previous turn)
             adminChapters: () => `
                 <div class="p-4 fade-in">
@@ -3879,30 +4606,174 @@ ${db.courses.map(c => `
                 </div>
             `,
 
-            adminResults: () => `
-                <div class="p-4 fade-in">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-black text-xl">Student Results</h2>
-                        <button onclick="actions.clearResults()" class="text-xs font-bold text-red-600">CLEAR ALL</button>
+            adminResults: () => {
+                const rows = appState.onlineResults || [];
+                const total = rows.length;
+                const passCount = rows.filter(r => r.pass === true).length;
+                const failCount = total - passCount;
+                const avg = total ? Math.round(rows.reduce((sum, r) => sum + Number(r.percentage || 0), 0) / total) : 0;
+
+                const fmtTime = (r) => {
+                    if (r.submittedAt?.seconds) {
+                        return new Date(r.submittedAt.seconds * 1000).toLocaleString('en-IN', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    }
+                    return r.date || '-';
+                };
+
+                return `
+                <div class="p-4 fade-in space-y-5">
+                    <div class="bg-gray-900 text-white rounded-3xl p-5 shadow-xl">
+                        <div class="flex justify-between items-center gap-3">
+                            <div>
+                                <h2 class="font-black text-xl">📊 ONLINE TEST RESULTS</h2>
+                                <p class="text-gray-400 text-[10px] font-bold mt-1 uppercase tracking-widest">Firebase • Live Student Results</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="actions.copyTodayResults()" class="bg-green-600 text-white px-3 py-2 rounded-xl text-xs font-black">📋 COPY TODAY RESULTS</button>
+                                <button onclick="actions.copyAnswerKey()" class="bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-black">📝 COPY ANSWER KEY</button>
+                                <button onclick="actions.loadOnlineResults()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-black">🔄 REFRESH</button>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-blue-700">${total}</div>
+                            <div class="text-[10px] font-black text-blue-800 uppercase">Total Attempts</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-green-700">${passCount}</div>
+                            <div class="text-[10px] font-black text-green-800 uppercase">Pass</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-red-700">${failCount}</div>
+                            <div class="text-[10px] font-black text-red-800 uppercase">Fail</div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-purple-700">${avg}%</div>
+                            <div class="text-[10px] font-black text-purple-800 uppercase">Average</div>
+                        </div>
+                    </div>
+
+                    ${appState.onlineResultsLoading ? `
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
+                            <p class="font-black text-blue-800">⏳ Firebase से results ला रहे हैं...</p>
+                        </div>
+                    ` : ''}
+
+                    ${appState.onlineResultsError ? `
+                        <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+                            <p class="font-black text-red-800 text-sm">${appState.onlineResultsError}</p>
+                        </div>
+                    ` : ''}
+
                     <div class="space-y-3">
-                        ${db.results.slice().reverse().map(r => `
+                        ${rows.map((r, idx) => `
                             <div class="bg-white p-4 rounded-2xl border shadow-sm">
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-xs font-black text-gray-800 uppercase">${r.studentName}</span>
+                                <div class="flex justify-between items-start gap-2">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-black">${idx + 1}</span>
+                                            <span class="text-sm font-black text-gray-800 uppercase truncate">${String(r.studentName || 'Unknown Student')}</span>
+                                        </div>
+                                        <p class="text-[10px] font-bold text-gray-500 mt-2">${String(r.testTitle || 'Daily Test')}</p>
+                                    </div>
                                     <span class="badge ${r.pass ? 'badge-pass':'badge-fail'}">${r.pass ? 'PASS':'FAIL'}</span>
                                 </div>
-                                <p class="text-[10px] font-bold text-gray-500">${r.testTitle}</p>
-                                <div class="flex justify-between items-end mt-2">
-                                    <span class="text-[9px] text-gray-400 font-bold">${r.date}</span>
-                                    <span class="text-sm font-black text-brand-600">${r.correct}/${r.total} (${r.percentage}%)</span>
+                                <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+                                    <div class="bg-gray-50 rounded-xl p-2">
+                                        <div class="text-sm font-black text-brand-600">${Number(r.correct || 0)}/${Number(r.total || 0)}</div>
+                                        <div class="text-[9px] text-gray-400 font-bold">SCORE</div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-xl p-2">
+                                        <div class="text-sm font-black text-brand-600">${Number(r.percentage || 0)}%</div>
+                                        <div class="text-[9px] text-gray-400 font-bold">PERCENT</div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-xl p-2">
+                                        <div class="text-[10px] font-black text-gray-600">${fmtTime(r)}</div>
+                                        <div class="text-[9px] text-gray-400 font-bold">TIME</div>
+                                    </div>
                                 </div>
+                                <button onclick="actions.viewOnlineAnswerSheet(${idx})" class="w-full mt-3 py-3 bg-blue-50 text-blue-700 rounded-xl font-black text-xs">
+                                    📝 ${Array.isArray(r.answerDetails) ? 'VIEW ANSWER SHEET' : 'ANSWER SHEET NOT SAVED'}
+                                </button>
                             </div>
-                        `).join('') || '<p class="text-center py-10 text-gray-400 font-bold">No results found.</p>'}
+                        `).join('') || `
+                            <div class="bg-white rounded-2xl border p-8 text-center">
+                                <div class="text-4xl mb-2">📭</div>
+                                <p class="font-black text-gray-500">अभी कोई online result नहीं मिला।</p>
+                            </div>
+                        `}
                     </div>
-                    <button onclick="actions.setTab('adminDashboard')" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold">BACK</button>
+
+                    <button onclick="actions.setTab('adminDashboard')" class="w-full py-3 bg-gray-100 rounded-xl font-bold">BACK TO ADMIN PANEL</button>
                 </div>
-            `,
+                `;
+            },
+
+            adminAnswerSheet: () => {
+                const r = appState.selectedOnlineResult;
+                if (!r) {
+                    return `
+                        <div class="p-6 text-center">
+                            <p class="font-black text-gray-500">Answer Sheet नहीं मिली।</p>
+                            <button onclick="actions.setTab('adminResults')" class="mt-5 w-full py-3 bg-gray-100 rounded-xl font-bold">BACK TO RESULTS</button>
+                        </div>
+                    `;
+                }
+                const details = Array.isArray(r.answerDetails) ? r.answerDetails : [];
+                return `
+                <div class="p-4 fade-in pb-32">
+                    <div class="bg-gradient-to-br from-blue-800 to-indigo-700 text-white rounded-3xl p-5 shadow-xl mb-5">
+                        <button onclick="actions.backFromOnlineAnswerSheet()" class="text-xs font-black bg-white/15 px-3 py-2 rounded-xl mb-4">← BACK</button>
+                        <h2 class="font-black text-xl">📝 STUDENT ANSWER SHEET</h2>
+                        <p class="text-blue-100 text-xs font-bold mt-1">${String(r.studentName || '').toUpperCase()}</p>
+                        <p class="text-blue-200 text-[10px] mt-1">${r.testTitle || 'Daily Test'}</p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 mb-5">
+                        <div class="bg-green-50 rounded-2xl p-3 text-center"><b class="text-green-700 text-xl">${r.correct || 0}</b><div class="text-[9px] font-black">CORRECT</div></div>
+                        <div class="bg-red-50 rounded-2xl p-3 text-center"><b class="text-red-700 text-xl">${r.wrong || 0}</b><div class="text-[9px] font-black">WRONG</div></div>
+                        <div class="bg-blue-50 rounded-2xl p-3 text-center"><b class="text-blue-700 text-xl">${r.percentage || 0}%</b><div class="text-[9px] font-black">PERCENT</div></div>
+                    </div>
+
+                    ${details.length ? `
+                        <div class="space-y-3">
+                            ${details.map(d => `
+                                <div class="bg-white rounded-2xl border shadow-sm p-4 ${d.isCorrect ? 'border-green-200' : 'border-red-200'}">
+                                    <div class="flex gap-2">
+                                        <span class="w-7 h-7 shrink-0 rounded-full ${d.isCorrect ? 'bg-green-600' : 'bg-red-600'} text-white flex items-center justify-center text-[10px] font-black">${d.no}</span>
+                                        <p class="text-sm font-black leading-5">${d.question}</p>
+                                    </div>
+                                    <div class="mt-3 space-y-2">
+                                        <div class="bg-gray-50 rounded-xl p-3">
+                                            <div class="text-[9px] font-black text-gray-400 uppercase">Student Answer</div>
+                                            <div class="text-xs font-black ${d.isCorrect ? 'text-green-700' : 'text-red-700'}">${d.selectedIndex === null ? '⬜ Not Attempted' : `${d.selectedLetter}. ${d.selectedText} ${d.isCorrect ? '✅' : '❌'}`}</div>
+                                        </div>
+                                        ${!d.isCorrect ? `
+                                            <div class="bg-green-50 rounded-xl p-3">
+                                                <div class="text-[9px] font-black text-gray-400 uppercase">Correct Answer</div>
+                                                <div class="text-xs font-black text-green-700">✅ ${d.correctLetter}. ${d.correctText}</div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 text-center">
+                            <p class="font-black text-yellow-800">इस result में Answer Sheet data उपलब्ध नहीं है।</p>
+                            <p class="text-[10px] text-yellow-700 mt-1">यह पुराने submission का result है।</p>
+                        </div>
+                    `}
+
+                    <button onclick="actions.backFromOnlineAnswerSheet()" class="w-full mt-5 py-4 bg-gray-900 text-white rounded-2xl font-black">BACK TO RESULTS</button>
+                </div>
+                `;
+            },
 
             adminPdfs: () => `
                 <div class="p-4 fade-in">
@@ -3958,7 +4829,7 @@ ${db.courses.map(c => `
                         <h4 class="font-black text-sm mb-4">App Information</h4>
                         <div class="space-y-2 text-xs font-bold text-gray-500">
                             <div class="flex justify-between"><span>Version</span><span>1.0.0</span></div>
-                            <div class="flex justify-between"><span>Database</span><span>Local Storage</span></div>
+                            <div class="flex justify-between"><span>Database</span><span>Firebase Online</span></div>
                             <div class="flex justify-between"><span>Last Sync</span><span>Just now</span></div>
                         </div>
                     </div>
@@ -5648,8 +6519,8 @@ ${db.courses.map(c => `
                         <h3 class="font-black text-lg mb-6">Change Password</h3>
                         <form onsubmit="actions.changeAdminPass(event)" class="space-y-5">
                             <div class="input-group">
-                                <label class="text-[10px] font-black text-gray-500 uppercase">New Password</label>
-                                <input id="newAdminPass" type="password" required class="input-field" placeholder="Min 4 characters" />
+                                <label class="text-[10px] font-black text-gray-500 uppercase">New Firebase Password</label>
+                                <input id="newAdminPass" type="password" required minlength="6" class="input-field" placeholder="Minimum 6 characters" />
                             </div>
                             <button type="submit" class="w-full bg-brand-600 text-white py-4 rounded-xl font-black">UPDATE PASSWORD</button>
                         </form>
@@ -5689,6 +6560,7 @@ ${db.courses.map(c => `
                 case 'adminQuestions': main = UI.adminQuestions(); break;
                 case 'adminTests': main = UI.adminTests(); break;
                 case 'adminResults': main = UI.adminResults(); break;
+                case 'adminAnswerSheet': main = UI.adminAnswerSheet(); break;
                 case 'adminPdfs': main = UI.adminPdfs(); break;
                 case 'adminContact': main = UI.adminContact(); break;
                 case 'adminSettings': main = UI.adminSettings(); break;
