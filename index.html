@@ -538,7 +538,7 @@ a.everest-force-back {
     <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA9ZDZ3gsiyWsecs22WSH9rZZOx9qQe55Y",
@@ -577,6 +577,16 @@ a.everest-force-back {
       return await signOut(auth);
     },
     onAdminAuthChanged: (callback) => onAuthStateChanged(auth, callback),
+
+    createPhoneRecaptcha: () => {
+      if (window.__everestRecaptchaVerifier) return window.__everestRecaptchaVerifier;
+      window.__everestRecaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
+      return window.__everestRecaptchaVerifier;
+    },
+    sendStudentOtp: async (phone) => {
+      const verifier = window.EverestFirebase.createPhoneRecaptcha();
+      return await signInWithPhoneNumber(auth, phone, verifier);
+    },
 
     saveTestResult: async (result) => {
       const payload = {
@@ -2695,13 +2705,65 @@ a.everest-force-back {
                 }
                 window.scrollTo(0,0); render();
             },
-            login: (e) => {
+            login: async (e) => {
                 e.preventDefault();
-                const id = document.getElementById('studentId').value;
-                const pass = document.getElementById('studentPass').value;
-                const user = db.users.find(u => u.id === id && u.password === pass);
-                if (user) { appState.currentUser = user; actions.setTab('studentDashboard'); }
-                else { alert("Invalid Credentials"); }
+                const name = document.getElementById('studentName')?.value?.trim() || '';
+                const mobileRaw = document.getElementById('studentMobile')?.value?.trim() || '';
+                if (!name) { alert("कृपया अपना पूरा नाम लिखें।"); return; }
+                const phone = mobileRaw.startsWith('+') ? mobileRaw.replace(/[^+\d]/g, '') : (/^\d{10}$/.test(mobileRaw) ? '+91' + mobileRaw : '');
+                if (!/^\+\d{10,15}$/.test(phone)) { alert("कृपया 10 अंकों का Indian Mobile Number या +CountryCode वाला Test Number डालें।"); return; }
+                try {
+                    const confirmation = await window.EverestFirebase.sendStudentOtp(phone);
+                    window.__everestOtpConfirmation = confirmation;
+                    window.__everestStudentName = name;
+                    window.__everestStudentMobile = mobileRaw;
+                    alert("📱 OTP भेजा जा रहा है\n" + phone + " पर SMS आने के बाद OK दबाएँ।");
+                    actions.showStudentOtp();
+                } catch (err) {
+                    console.error('Student OTP error:', err);
+                    const code = err?.code || '';
+                    if (window.__everestRecaptchaVerifier) {
+                        try { window.__everestRecaptchaVerifier.clear(); } catch (_) {}
+                        window.__everestRecaptchaVerifier = null;
+                    }
+                    if (code === 'auth/operation-not-allowed') {
+                        alert("❌ Firebase Phone Auth/SMS अभी अनुमति नहीं है। Firebase Console में Phone provider और SMS region policy check करें।");
+                    } else if (code === 'auth/invalid-phone-number') {
+                        alert("❌ Mobile Number सही नहीं है। 10 अंकों का Indian number डालें।");
+                    } else if (code === 'auth/quota-exceeded') {
+                        alert("⚠️ SMS quota समाप्त हो गया है। बाद में फिर try करें।");
+                    } else if (code === 'auth/captcha-check-failed') {
+                        alert("❌ reCAPTCHA verification failed. Page को Ctrl+F5 से refresh करके फिर try करें।");
+                    } else {
+                        alert("❌ OTP नहीं भेजा गया: " + (err?.message || 'Unknown error'));
+                    }
+                }
+            },
+            showStudentOtp: () => {
+                appState.activeTab = 'studentOtp';
+                render();
+            },
+            verifyStudentOtp: async () => {
+                const code = document.getElementById('studentOtp')?.value?.trim() || '';
+                if (!/^\d{6}$/.test(code)) { alert("कृपया 6 अंकों का OTP डालें।"); return; }
+                if (!window.__everestOtpConfirmation) { alert("पहले OTP भेजें।"); return; }
+                try {
+                    const credential = await window.__everestOtpConfirmation.confirm(code);
+                    const user = {
+                        name: window.__everestStudentName || 'Student',
+                        mobile: window.__everestStudentMobile || '',
+                        uid: credential.user.uid,
+                        phoneNumber: credential.user.phoneNumber || ''
+                    };
+                    appState.currentUser = user;
+                    window.__everestOtpConfirmation = null;
+                    window.__everestStudentName = '';
+                    window.__everestStudentMobile = '';
+                    actions.setTab('studentDashboard');
+                } catch (err) {
+                    console.error('Student OTP verify error:', err);
+                    alert("❌ OTP गलत है या expire हो गया है: " + (err?.message || 'Verification failed'));
+                }
             },
             adminLogin: async (e) => {
                 e.preventDefault();
@@ -2908,9 +2970,11 @@ a.everest-force-back {
             },
 
             startTodayTest: () => {
-                const name = prompt("आज के Test के लिए अपना पूरा नाम लिखें:");
-                if(!name || !name.trim()) { alert("कृपया अपना नाम लिखें।"); return; }
-                appState.currentUser = { name: name.trim() };
+                if (!appState.currentUser || !appState.currentUser.name) {
+                    alert("📱 पहले Student Login करके OTP Verify करें।");
+                    actions.setTab('studentLogin');
+                    return;
+                }
                 const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson1');
                 if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
                 actions.startTest('RS-CIT', idx);
@@ -4357,24 +4421,55 @@ ${db.courses.map(c => `
                             <div class="everest-login-brand-icon">🎓</div>
                         </div>
                         <div class="everest-login-heading">
-                            <div class="everest-login-round-icon">🎓</div>
+                            <div class="everest-login-round-icon">📱</div>
                             <h2>Student Login</h2>
                             <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
-                            <div class="everest-login-tagline">अपनी तैयारी को दें नई दिशा 🚀</div>
+                            <div class="everest-login-tagline">नाम + Mobile Number → OTP → Login 🚀</div>
                         </div>
                         <form onsubmit="actions.login(event)" class="space-y-5">
                             <div class="input-group">
-                                <label class="text-[10px] font-black text-gray-500 uppercase">Student ID</label>
-                                <input id="studentId" required class="input-field" placeholder="RS001" />
+                                <label class="text-[10px] font-black text-gray-500 uppercase">Student Name</label>
+                                <input id="studentName" required class="input-field" autocomplete="name" placeholder="अपना पूरा नाम लिखें" />
                             </div>
                             <div class="input-group">
-                                <label class="text-[10px] font-black text-gray-500 uppercase">PIN Password</label>
-                                <input id="studentPass" type="password" required class="input-field" placeholder="****" />
+                                <label class="text-[10px] font-black text-gray-500 uppercase">Mobile Number</label>
+                                <input id="studentMobile" required class="input-field" inputmode="tel" autocomplete="tel" placeholder="Mobile Number / Test Number" />
                             </div>
-                            <button type="submit" class="everest-login-main-btn">🔓 LOGIN <span>›</span></button>
+                            <div id="recaptcha-container" style="min-height:1px;width:1px;position:absolute;left:-9999px;overflow:hidden;"></div>
+                            <button type="submit" class="everest-login-main-btn">📲 SEND OTP <span>›</span></button>
                             <button type="button" onclick="actions.setTab('login')" class="everest-login-back-btn">← Back to Home</button>
                         </form>
-                        <div class="everest-login-footer">कंप्यूटर शिक्षा, उज्जवल भविष्य</div>
+                        <div class="everest-login-footer">OTP से सुरक्षित Student Login</div>
+                    </div>
+                </div>
+            `,
+
+            studentOtp: () => `
+                <div class="p-4 fade-in mt-6">
+                    <div class="everest-login-card">
+                        <div class="everest-login-brandbar">
+                            <div class="everest-login-brand-logo"><img src="${IMAGES.logo}" alt="EVEREST IT Logo" /></div>
+                            <div class="everest-login-brand-text">
+                                <div class="everest-login-brand-name">EVEREST IT ज्ञान केंद्र</div>
+                                <div class="everest-login-brand-place">खेरवाड़ा</div>
+                            </div>
+                            <div class="everest-login-brand-icon">🔐</div>
+                        </div>
+                        <div class="everest-login-heading">
+                            <div class="everest-login-round-icon">🔢</div>
+                            <h2>OTP Verify</h2>
+                            <p>OTP आपके Mobile Number पर भेजा गया है</p>
+                            <div class="everest-login-tagline">6 अंकों का OTP डालकर Login करें</div>
+                        </div>
+                        <div class="space-y-5" style="padding:0 18px;">
+                            <div class="input-group">
+                                <label class="text-[10px] font-black text-gray-500 uppercase">OTP</label>
+                                <input id="studentOtp" class="input-field" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 अंकों का OTP" />
+                            </div>
+                            <button type="button" onclick="actions.verifyStudentOtp()" class="everest-login-main-btn">✅ VERIFY & LOGIN <span>›</span></button>
+                            <button type="button" onclick="actions.setTab('studentLogin')" class="everest-login-back-btn">← Mobile Number बदलें</button>
+                        </div>
+                        <div class="everest-login-footer">EVEREST IT Student App</div>
                     </div>
                 </div>
             `,
@@ -6553,6 +6648,7 @@ studentDashboard: () => `
                 case 'hindiTyping': main = UI.hindiTyping(); break;
                 case 'login': main = UI.login(); break;
                 case 'studentLogin': main = UI.studentLogin(); break;
+                case 'studentOtp': main = UI.studentOtp(); break;
                 case 'adminLogin': main = UI.adminLogin(); break;
                 case 'studentDashboard': main = UI.studentDashboard(); break;
                 case 'adminDashboard': main = UI.adminDashboard(); break;
