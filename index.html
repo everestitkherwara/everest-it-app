@@ -578,15 +578,20 @@ a.everest-force-back {
     },
     onAdminAuthChanged: (callback) => onAuthStateChanged(auth, callback),
 
-    createPhoneRecaptcha: () => {
-      if (window.__everestRecaptchaVerifier) return window.__everestRecaptchaVerifier;
-      window.__everestRecaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      return window.__everestRecaptchaVerifier;
-    },
-    sendStudentOtp: async (phone) => {
-      const verifier = window.EverestFirebase.createPhoneRecaptcha();
-      return await signInWithPhoneNumber(auth, phone, verifier);
-    },
+    createPhoneRecaptcha: async (phone) => {
+       if (window.__everestRecaptchaVerifier) {
+         try { window.__everestRecaptchaVerifier.clear(); } catch (_) {}
+         window.__everestRecaptchaVerifier = null;
+       }
+       // ONLY the Firebase fictional test number uses testing app-verification bypass.
+       auth.settings.appVerificationDisabledForTesting = (phone === "+16505553434");
+       window.__everestRecaptchaVerifier = new RecaptchaVerifier(auth, "studentSendOtpBtn", { size: "invisible" });
+       return window.__everestRecaptchaVerifier;
+     },
+     sendStudentOtp: async (phone) => {
+       const verifier = await window.EverestFirebase.createPhoneRecaptcha(phone);
+       return await signInWithPhoneNumber(auth, phone, verifier);
+     },
 
     saveTestResult: async (result) => {
       const payload = {
@@ -3437,6 +3442,14 @@ a.everest-force-back {
             home: () => `
                 <div class="p-4 fade-in space-y-5">
                     <div class="custom-marquee"><div class="marquee-content">🏆 2009 से 15 हजार से भी अधिक RS-CIT पास छात्र, छात्रों के विश्वास के साथ खेरवाड़ा का एक अग्रणी संस्थान &nbsp;&nbsp;&nbsp; 📢 EVEREST IT ज्ञान केंद्र, खेरवाड़ा में आपका स्वागत है। &nbsp;&nbsp;&nbsp; 📢 नया RS-CIT बैच 15 तारीख से शुरू हो रहा है। आज ही Admission लें!</div></div>
+
+                    <!-- RS-CIT EXAM NOTIFICATION -->
+                    <div style="background:linear-gradient(135deg,#fff7ed,#fff1f2);border:2px solid #f97316;border-radius:18px;padding:14px 16px;box-shadow:0 8px 20px rgba(249,115,22,.12);">
+                        <div style="font-size:18px;font-weight:900;color:#c2410c;margin-bottom:5px;">🔔 जरूरी सूचना</div>
+                        <div style="font-size:15px;font-weight:900;color:#1f2937;margin-bottom:4px;">📅 आगामी RS-CIT परीक्षा — 11 अक्टूबर 2026</div>
+                        <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;">आगामी RS-CIT परीक्षा 11 अक्टूबर को होने वाली है। सभी विद्यार्थी अपनी परीक्षा की तैयारी पूरी रखें और Daily Test तथा Mock Test जरूर दें।</div>
+                    </div>
+
                     <!-- TODAY'S DAILY TEST -->
                     <div class="today-test-card">
                         <div class="today-test-badge">📢 TODAY TEST</div>
@@ -4436,7 +4449,7 @@ ${db.courses.map(c => `
                                 <input id="studentMobile" required class="input-field" inputmode="tel" autocomplete="tel" placeholder="Mobile Number / Test Number" />
                             </div>
                             <div id="recaptcha-container" style="min-height:1px;width:1px;position:absolute;left:-9999px;overflow:hidden;"></div>
-                            <button type="submit" class="everest-login-main-btn">📲 SEND OTP <span>›</span></button>
+                            <button id="studentSendOtpBtn" type="submit" class="everest-login-main-btn">📲 SEND OTP <span>›</span></button>
                             <button type="button" onclick="actions.setTab('login')" class="everest-login-back-btn">← Back to Home</button>
                         </form>
                         <div class="everest-login-footer">OTP से सुरक्षित Student Login</div>
