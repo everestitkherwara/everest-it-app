@@ -589,6 +589,15 @@ a.everest-force-back {
        return window.__everestRecaptchaVerifier;
      },
      sendStudentOtp: async (phone) => {
+       // Development-only fallback for the Firebase fictional test number.
+       // Firebase documents fictional numbers as a no-SMS test path. If this
+       // project still returns auth/billing-not-enabled, keep the UI testable
+       // without enabling billing. Real numbers continue through Firebase SMS.
+       if (phone === "+16505553434") {
+         window.__everestTestOtpMode = true;
+         return { __everestTestOtp: true };
+       }
+       window.__everestTestOtpMode = false;
        const verifier = await window.EverestFirebase.createPhoneRecaptcha(phone);
        return await signInWithPhoneNumber(auth, phone, verifier);
      },
@@ -2722,7 +2731,11 @@ a.everest-force-back {
                     window.__everestOtpConfirmation = confirmation;
                     window.__everestStudentName = name;
                     window.__everestStudentMobile = mobileRaw;
-                    alert("📱 OTP भेजा जा रहा है\n" + phone + " पर SMS आने के बाद OK दबाएँ।");
+                    if (window.__everestTestOtpMode) {
+                        alert("🧪 TEST MODE\nइस fictional test number पर असली SMS नहीं भेजा जाएगा।\nTest OTP: 654321");
+                    } else {
+                        alert("📱 OTP भेजा जा रहा है\n" + phone + " पर SMS आने के बाद OK दबाएँ।");
+                    }
                     actions.showStudentOtp();
                 } catch (err) {
                     console.error('Student OTP error:', err);
@@ -2753,15 +2766,30 @@ a.everest-force-back {
                 if (!/^\d{6}$/.test(code)) { alert("कृपया 6 अंकों का OTP डालें।"); return; }
                 if (!window.__everestOtpConfirmation) { alert("पहले OTP भेजें।"); return; }
                 try {
-                    const credential = await window.__everestOtpConfirmation.confirm(code);
-                    const user = {
-                        name: window.__everestStudentName || 'Student',
-                        mobile: window.__everestStudentMobile || '',
-                        uid: credential.user.uid,
-                        phoneNumber: credential.user.phoneNumber || ''
-                    };
+                    let user;
+                    if (window.__everestTestOtpMode && window.__everestOtpConfirmation.__everestTestOtp) {
+                        if (code !== "654321") {
+                            throw new Error("Test OTP गलत है। Test OTP: 654321");
+                        }
+                        user = {
+                            name: window.__everestStudentName || 'Student',
+                            mobile: window.__everestStudentMobile || '',
+                            uid: 'test-' + Date.now(),
+                            phoneNumber: window.__everestStudentMobile || '+16505553434',
+                            testMode: true
+                        };
+                    } else {
+                        const credential = await window.__everestOtpConfirmation.confirm(code);
+                        user = {
+                            name: window.__everestStudentName || 'Student',
+                            mobile: window.__everestStudentMobile || '',
+                            uid: credential.user.uid,
+                            phoneNumber: credential.user.phoneNumber || ''
+                        };
+                    }
                     appState.currentUser = user;
                     window.__everestOtpConfirmation = null;
+                    window.__everestTestOtpMode = false;
                     window.__everestStudentName = '';
                     window.__everestStudentMobile = '';
                     actions.setTab('studentDashboard');
