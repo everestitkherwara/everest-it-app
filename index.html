@@ -2523,7 +2523,12 @@ a.everest-force-back {
             activeYear: null,
             activePaperDate: null,
             paperState: { currentQ: 0, answers: {}, submitted: false, results: null },
-            currentUser: null,
+            currentUser: (() => {
+                try {
+                    const saved = localStorage.getItem('everestStudent');
+                    return saved ? JSON.parse(saved) : null;
+                } catch (_) { return null; }
+            })(),
             isAdmin: false,
             testState: { activeTest: null, currentQ: 0, answers: {}, submitted: false, results: null },
             lastResult: null,
@@ -2719,6 +2724,25 @@ a.everest-force-back {
                 }
                 window.scrollTo(0,0); render();
             },
+            // Keep the student profile available after refresh/navigation. Firebase Auth itself persists
+            // the verified phone session; the local profile keeps the student's entered name/mobile for UI/results.
+            if (window.EverestFirebase?.onAdminAuthChanged) {
+                window.EverestFirebase.onAdminAuthChanged((firebaseUser) => {
+                    if (firebaseUser && firebaseUser.phoneNumber && !appState.isAdmin) {
+                        try {
+                            const saved = JSON.parse(localStorage.getItem('everestStudent') || 'null');
+                            if (saved) {
+                                appState.currentUser = {
+                                    ...saved,
+                                    uid: firebaseUser.uid,
+                                    phoneNumber: firebaseUser.phoneNumber
+                                };
+                                localStorage.setItem('everestStudent', JSON.stringify(appState.currentUser));
+                            }
+                        } catch (_) {}
+                    }
+                });
+            },
             login: async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('studentName')?.value?.trim() || '';
@@ -2788,6 +2812,7 @@ a.everest-force-back {
                         };
                     }
                     appState.currentUser = user;
+                    try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
                     window.__everestOtpConfirmation = null;
                     window.__everestTestOtpMode = false;
                     window.__everestStudentName = '';
@@ -2836,6 +2861,7 @@ a.everest-force-back {
                     try { await window.EverestFirebase.adminSignOut(); } catch (e) { console.error(e); }
                 }
                 appState.currentUser = null;
+                try { localStorage.removeItem('everestStudent'); } catch (_) {}
                 appState.isAdmin = false;
                 appState.lastResult = null;
                 actions.setTab('home');
@@ -3003,6 +3029,13 @@ a.everest-force-back {
             },
 
             startTodayTest: () => {
+                // Restore the verified student profile if the page was refreshed.
+                if (!appState.currentUser || !appState.currentUser.name) {
+                    try {
+                        const saved = localStorage.getItem('everestStudent');
+                        if (saved) appState.currentUser = JSON.parse(saved);
+                    } catch (_) {}
+                }
                 if (!appState.currentUser || !appState.currentUser.name) {
                     alert("📱 पहले Student Login करके OTP Verify करें।");
                     actions.setTab('studentLogin');
@@ -3435,7 +3468,7 @@ a.everest-force-back {
                         <span>COURSES</span>
                         <div class="active-indicator"></div>
                     </button>
-                    <button onclick="actions.setTab('mocktest', {course: null})" class="nav-link ${isMock ? 'active' : ''}">
+                    <button onclick="actions.startTodayTest()" class="nav-link ${isMock || appState.activeTab === 'testInterface' ? 'active' : ''}">
                         ${ICONS.test}
                         <span>MOCK TEST</span>
                         <div class="active-indicator"></div>
