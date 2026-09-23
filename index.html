@@ -2523,12 +2523,7 @@ a.everest-force-back {
             activeYear: null,
             activePaperDate: null,
             paperState: { currentQ: 0, answers: {}, submitted: false, results: null },
-            currentUser: (() => {
-                try {
-                    const saved = localStorage.getItem('everestStudent');
-                    return saved ? JSON.parse(saved) : null;
-                } catch (_) { return null; }
-            })(),
+            currentUser: null,
             isAdmin: false,
             testState: { activeTest: null, currentQ: 0, answers: {}, submitted: false, results: null },
             lastResult: null,
@@ -2546,6 +2541,15 @@ a.everest-force-back {
                 typing: false
             }
         };
+
+        // Restore the verified student session after refresh/reopen.
+        try {
+            const savedStudent = localStorage.getItem('everestStudent');
+            if (savedStudent) {
+                const parsedStudent = JSON.parse(savedStudent);
+                if (parsedStudent && parsedStudent.name) appState.currentUser = parsedStudent;
+            }
+        } catch (_) {}
 
         // Keep Admin session synced with Firebase Authentication.
         if (window.EverestFirebase?.onAdminAuthChanged) {
@@ -2724,25 +2728,6 @@ a.everest-force-back {
                 }
                 window.scrollTo(0,0); render();
             },
-            // Keep the student profile available after refresh/navigation. Firebase Auth itself persists
-            // the verified phone session; the local profile keeps the student's entered name/mobile for UI/results.
-            if (window.EverestFirebase?.onAdminAuthChanged) {
-                window.EverestFirebase.onAdminAuthChanged((firebaseUser) => {
-                    if (firebaseUser && firebaseUser.phoneNumber && !appState.isAdmin) {
-                        try {
-                            const saved = JSON.parse(localStorage.getItem('everestStudent') || 'null');
-                            if (saved) {
-                                appState.currentUser = {
-                                    ...saved,
-                                    uid: firebaseUser.uid,
-                                    phoneNumber: firebaseUser.phoneNumber
-                                };
-                                localStorage.setItem('everestStudent', JSON.stringify(appState.currentUser));
-                            }
-                        } catch (_) {}
-                    }
-                });
-            },
             login: async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('studentName')?.value?.trim() || '';
@@ -2817,7 +2802,12 @@ a.everest-force-back {
                     window.__everestTestOtpMode = false;
                     window.__everestStudentName = '';
                     window.__everestStudentMobile = '';
-                    actions.setTab('studentDashboard');
+                    const todayIdx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson1');
+                    if (todayIdx >= 0) {
+                        actions.startTest('RS-CIT', todayIdx);
+                    } else {
+                        actions.setTab('studentDashboard');
+                    }
                 } catch (err) {
                     console.error('Student OTP verify error:', err);
                     alert("❌ OTP गलत है या expire हो गया है: " + (err?.message || 'Verification failed'));
@@ -3029,13 +3019,6 @@ a.everest-force-back {
             },
 
             startTodayTest: () => {
-                // Restore the verified student profile if the page was refreshed.
-                if (!appState.currentUser || !appState.currentUser.name) {
-                    try {
-                        const saved = localStorage.getItem('everestStudent');
-                        if (saved) appState.currentUser = JSON.parse(saved);
-                    } catch (_) {}
-                }
                 if (!appState.currentUser || !appState.currentUser.name) {
                     alert("📱 पहले Student Login करके OTP Verify करें।");
                     actions.setTab('studentLogin');
@@ -3468,7 +3451,7 @@ a.everest-force-back {
                         <span>COURSES</span>
                         <div class="active-indicator"></div>
                     </button>
-                    <button onclick="actions.startTodayTest()" class="nav-link ${isMock || appState.activeTab === 'testInterface' ? 'active' : ''}">
+                    <button onclick="actions.setTab('mocktest', {course: null})" class="nav-link ${isMock ? 'active' : ''}">
                         ${ICONS.test}
                         <span>MOCK TEST</span>
                         <div class="active-indicator"></div>
