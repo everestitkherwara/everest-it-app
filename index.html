@@ -602,6 +602,19 @@ a.everest-force-back {
        return await signInWithPhoneNumber(auth, phone, verifier);
      },
 
+    saveStudent: async (student) => {
+      const payload = {
+        name: student.name || "Student",
+        mobile: student.mobile || "",
+        phoneNumber: student.phoneNumber || "",
+        uid: student.uid || "",
+        otpVerified: true,
+        loginAt: serverTimestamp(),
+        source: "EVEREST IT STUDENT APP"
+      };
+      return await addDoc(collection(firestore, "students"), payload);
+    },
+
     saveTestResult: async (result) => {
       const payload = {
         ...result,
@@ -2798,6 +2811,16 @@ a.everest-force-back {
                     }
                     appState.currentUser = user;
                     try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
+
+                    // Save every successfully verified student login in Firestore.
+                    // If Firestore rules are not yet configured for /students,
+                    // login will still continue normally.
+                    if (window.EverestFirebase?.saveStudent) {
+                        window.EverestFirebase.saveStudent(user).catch((saveErr) => {
+                            console.warn("Student record save failed:", saveErr);
+                        });
+                    }
+
                     window.__everestOtpConfirmation = null;
                     window.__everestTestOtpMode = false;
                     window.__everestStudentName = '';
