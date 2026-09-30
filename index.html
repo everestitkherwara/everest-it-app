@@ -537,7 +537,7 @@ a.everest-force-back {
 
     <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -614,25 +614,6 @@ a.everest-force-back {
     getTestResults: async () => {
       const snap = await getDocs(collection(firestore, "testResults"));
       return snap.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
-    },
-
-    saveStudent: async (student) => {
-      if (!student?.uid) throw new Error("Student UID missing.");
-      const payload = {
-        uid: student.uid,
-        name: student.name || "Student",
-        mobile: student.mobile || student.phoneNumber || "",
-        phoneNumber: student.phoneNumber || student.mobile || "",
-        otpVerified: true,
-        updatedAt: serverTimestamp(),
-        source: "EVEREST IT STUDENT APP"
-      };
-      return await setDoc(doc(firestore, "students", student.uid), payload, { merge: true });
-    },
-
-    getStudents: async () => {
-      const snap = await getDocs(collection(firestore, "students"));
-      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
     }
   };
 </script>
@@ -1718,42 +1699,42 @@ a.everest-force-back {
                     { q: "क्या हमें सोशल मीडिया पर निजी जानकारी शेयर करनी चाहिए?", options: ["सावधानी से, सीमित मात्रा में", "हाँ, सब कुछ", "बिल्कुल नहीं", "पता नहीं"], a: 0 },
                     { q: "आईटी (IT) का भविष्य क्या है?", options: ["Artificial Intelligence (AI)", "Cloud Computing", "IoT", "उपरोक्त सभी"], a: 3 }
                 ]},
-                { id: 'today-lesson1', title: 'LESSON 1 – INTRODUCTION TO COMPUTER', enabled: true, isToday: true, questions: [
-                    { q: "निम्न में कौन कंप्यूटर सिस्टम का आवश्यक कंपोनेंट नहीं है?", options: ["हार्डवेयर", "सॉफ्टवेयर", "बिजली", "यूजर"], a: 2 },
-                    { q: "निम्न में कौन डेटा का एक प्रकार है?", options: ["केवल असंसाधित तथ्य", "टेक्स्ट, इमेज", "ऑडियो व वीडियो", "उपरोक्त सभी"], a: 3 },
-                    { q: "डेटा को मुख्यतः बाइनरी फॉर्मेट में स्टोर किया जाता है, जो ______ होते हैं।", options: ["2 चिन्ह (0,1)", "8 चिन्ह (0-7)", "10 चिन्ह (0-9)", "16 चिन्ह (0-9, A-F)"], a: 0 },
-                    { q: "निम्न में कौनसा कथन सत्य है?", options: ["एक Byte 8 बिट के बराबर होता है", "दशमलव संख्या का आधार 10 होता है", "ASCII कोड में प्रत्येक कैरेक्टर 8 बिट का होता है", "उपरोक्त सभी"], a: 3 },
-                    { q: "निम्न में कौन सूचनाओं का समूह है?", options: ["डेटा", "रिकॉर्ड", "फाइल", "उपरोक्त सभी"], a: 3 },
-                    { q: "किसे कंप्यूटर का जनक के नाम से जाना जाता है?", options: ["बिल गेट्स", "चार्ल्स बैबेज", "स्टीव जॉब्स", "लेडी लारा"], a: 1 },
-                    { q: "निम्न में कौन कंप्यूटर सिस्टम की एक विशेषता नहीं है?", options: ["गति (Speed)", "शुद्धता (Accuracy)", "विविधता (Versatility)", "बुद्धि का अभाव (Lack of IQ)"], a: 3 },
-                    { q: "कंप्यूटर वर्गीकरण के आधार पर कौन कंप्यूटर का एक प्रकार नहीं है?", options: ["एनालॉग कंप्यूटर", "हाइब्रिड कंप्यूटर", "डिजिटल कंप्यूटर", "मैट्रिक्स कंप्यूटर"], a: 0 },
-                    { q: "कौन आकार, भंडारण और क्षमता के आधार पर डिजिटल कंप्यूटर का एक प्रकार है?", options: ["सुपर कंप्यूटर", "मिनी या माइक्रो कंप्यूटर", "माइक्रो कंप्यूटर", "उपरोक्त सभी"], a: 3 },
-                    { q: "हैंडहेल्ड कंप्यूटर छोटा व पोर्टेबल कंप्यूटिंग उपकरण है जिसे आप अपने हाथ में पकड़ सकते हैं। निम्न में कौन हैंडहेल्ड कंप्यूटर का उदाहरण है?", options: ["PDAs", "स्मार्टफोन", "टैबलेट पीसी", "उपरोक्त सभी"], a: 3 },
-                    { q: "निम्न में कौन माइक्रो-कंप्यूटर का एक उदाहरण है?", options: ["डेस्कटॉप और लैपटॉप", "नेटबुक और PDAs", "स्मार्टफोन और टैबलेट्स", "उपरोक्त सभी"], a: 3 },
-                    { q: "निम्न में कौन डेटा प्रोसेसिंग के मामले में सबसे शक्तिशाली कंप्यूटर है जिसका उपयोग अंतरिक्ष यान व सैटेलाइट को कंट्रोल करने के लिए किया जाता है?", options: ["माइक्रो कंप्यूटर", "सुपर कंप्यूटर", "मिनी कंप्यूटर", "मेनफ्रेम कंप्यूटर"], a: 1 },
-                    { q: "निम्न में कौन सुपर कंप्यूटर का एक प्रकार है?", options: ["IBM's Sequoia in USA", "FUJITSU'S K in Japan", "PARAM in India", "All of the above"], a: 3 },
-                    { q: "निम्न में कौन भारत का सबसे तेज और सबसे तेज डाटा हाई स्पीड सुपर कंप्यूटर है?", options: ["PARAM Shivay", "PARAM Rudra", "AIRAWAT (PSAI)", "PARAM Siddhi"], a: 2 },
-                    { q: "यह एक फ्लैट सर्किट बोर्ड है जो RAM, ROM, CPU, मेमोरी और अन्य पेरीफेरल उपकरणों को जोड़ता है और संपूर्ण सिस्टम में संचार का माध्यम होता है।", options: ["हार्ड डिस्क", "फ्लॉपी डिस्क", "मदरबोर्ड", "उपरोक्त सभी"], a: 2 },
-                    { q: "PC में संचार के लिए बस लाइन का उपयोग किया जाता है। एक Parallel संचार में एक समय में अधिकतम कितने सूचना संकेतित होते हैं?", options: ["8 बिट्स", "1 बिट्स", "8 बाइट", "4 बिट्स"], a: 0 },
-                    { q: "कंप्यूटर में कौन सा उपकरण AC विद्युत को विद्युत में परिवर्तित करता है?", options: ["POST", "Adapter", "CMOS", "RAM"], a: 2 },
-                    { q: "निम्न में कौनसा कथन प्रोसेसर से संबंधित है?", options: ["प्रोसेसर सिलिकॉन से बना होता है", "Intel, Core प्रोसेसर के प्रकार हैं", "प्रोसेसर में ट्रांजिस्टर होते हैं", "उपरोक्त सभी"], a: 3 },
-                    { q: "निम्न में कौनसा कथन सत्य है?", options: ["ALU और CU माइक्रोप्रोसेसर (CPU) के कंपोनेंट्स हैं", "CPU को कंप्यूटर का 'मस्तिष्क' माना जाता है", "CPU की गति Hz, GHz में मापी जाती है", "उपरोक्त सभी सत्य हैं"], a: 3 },
-                    { q: "सॉफ्टवेयर दो प्रकार का होता है, एक सिस्टम सॉफ्टवेयर और दूसरा एप्लिकेशन सॉफ्टवेयर। निम्न में कौन सिस्टम सॉफ्टवेयर नहीं है?", options: ["माइक्रोसॉफ्ट वर्ड", "ऑपरेटिंग सिस्टम", "डिवाइस ड्राइवर", "यूटिलिटीज टूल्स"], a: 0 },
-                    { q: "निम्न में कौन एप्लिकेशन सॉफ्टवेयर का एक प्रकार नहीं है?", options: ["वेब ब्राउजर", "बैंकिंग सॉफ्टवेयर", "डिवाइस ड्राइवर", "वर्ड प्रोसेसर"], a: 2 },
-                    { q: "निम्न में असत्य कथन का चयन करें।", options: ["सॉफ्टवेयर प्रोग्राम का समूह होता है", "डेटा त्रुटि को बग कहा जाता है", "ऑपरेटिंग सिस्टम एक हार्डवेयर है", "उपरोक्त सभी असत्य हैं"], a: 2 },
-                    { q: "निम्न में से कौनसी प्रोग्रामिंग भाषा नहीं है?", options: ["C", "Java", "Microsoft Office", "Pascal"], a: 2 },
-                    { q: "निम्न में कौन हार्डवेयर नहीं है?", options: ["Windows 11", "Keyboard, Mouse, CPU", "Hard Disk, Motherboard", "Monitor, Printer, Speaker"], a: 0 },
-                    { q: "आज के समय में कंप्यूटर का उपयोग किया जाता है।", options: ["शिक्षा, चिकित्सा, अनुसंधान", "प्रशासन, परिवहन, रेलवे, बैंक", "संचार, व्यापार, मनोरंजन, घर", "उपरोक्त सभी"], a: 3 },
-                    { q: "घर में कंप्यूटर का उपयोग किया जा सकता है।", options: ["सोशल मीडिया, ई-मेल व इंटरनेट का उपयोग करने के लिए", "बच्चों के स्कूल से संबंधित होमवर्क व प्रोजेक्ट वर्क के लिए", "मनोरंजन, ज्ञान व खेलने के लिए", "उपरोक्त सभी"], a: 3 },
-                    { q: "व्यापार में कंप्यूटर का उपयोग किया जा सकता है।", options: ["संचार, शिक्षा एवं ट्रेनिंग", "सेल्स और मार्केटिंग", "एकाउंट और फाइनेंस", "उपरोक्त सभी"], a: 3 },
-                    { q: "शिक्षा में कंप्यूटर का उपयोग किया जा सकता है।", options: ["स्मार्ट क्लासेस व डिजिटल लाइब्रेरी", "ऑनलाइन शिक्षा", "रिसर्च व प्रोजेक्ट", "उपरोक्त सभी"], a: 3 },
-                    { q: "चिकित्सा व स्वास्थ्य सेवा में कंप्यूटर का उपयोग किया जा सकता है।", options: ["हॉस्पिटल प्रबंधन में", "मेडिकल लेब व सर्जरी में", "डायग्नोस्टिक में", "उपरोक्त सभी"], a: 3 },
-                    { q: "निम्न में कौन असेंबली भाषा को मशीन भाषा में बदलता है?", options: ["कम्पाइलर", "इंटरप्रेटर", "असेंबलर", "कम्प्यूटर"], a: 2 },
-                    { q: "कंप्यूटर में वर्णमाला, संख्यात्मक और विराम चिन्ह को इलेक्ट्रॉनिक डेटा में प्रदर्शित करने के लिए सबसे अधिक किस कोड का उपयोग किया जाता है?", options: ["ASCII", "BCD", "ANSI", "USCII"], a: 0 },
-                    { q: "निम्न में कौन अंतरराष्ट्रीय भाषाओं (जैसे चीनी, जापानी, हिन्दी) को बाइनरी कोडिंग में बदलने के लिए इस्तेमाल की जाने वाली एक प्रणाली है?", options: ["UNICODE", "EBCDIC", "UNINODE", "EBCDIC 2.0"], a: 0 },
-                    { q: "जब कंप्यूटर स्टार्ट किया जाता है तो कौन हार्डवेयर उपकरणों की जाँच करता है?", options: ["POST", "CMOS", "DMOS", "RIP"], a: 0 },
-                    { q: "निम्न में कौनसा कम्प्रेशन प्रोग्राम नहीं है?", options: ["WinZip", "PKZip", "WinRAR", "RAID"], a: 3 },
-                    { q: "VGA केबल में कितने पिन होते हैं?", options: ["11", "14", "15", "17"], a: 2 },
+                { id: 'today-lesson2', title: 'LESSON 2 – COMPUTER SYSTEM', enabled: true, isToday: true, questions: [
+                    { q: "कंप्यूटर सिस्टम के मुख्य घटक कौन-कौन से हैं?", options: ["हार्डवेयर और सॉफ्टवेयर", "केवल हार्डवेयर", "केवल सॉफ्टवेयर", "केवल यूजर"], a: 0 },
+                    { q: "CPU का पूरा नाम क्या है?", options: ["Central Processing Unit", "Computer Processing Unit", "Central Program Unit", "Control Processing Unit"], a: 0 },
+                    { q: "CPU को कंप्यूटर का क्या कहा जाता है?", options: ["हृदय", "मस्तिष्क", "आंख", "कान"], a: 1 },
+                    { q: "ALU का पूरा नाम क्या है?", options: ["Arithmetic Logic Unit", "Advanced Logic Unit", "Arithmetic Link Unit", "Application Logic Unit"], a: 0 },
+                    { q: "ALU का मुख्य कार्य क्या है?", options: ["गणितीय और तार्किक कार्य करना", "फाइल प्रिंट करना", "इंटरनेट चलाना", "स्क्रीन दिखाना"], a: 0 },
+                    { q: "CU का पूरा नाम क्या है?", options: ["Control Unit", "Computer Unit", "Central Unit", "Control Utility"], a: 0 },
+                    { q: "Control Unit का मुख्य कार्य क्या है?", options: ["कंप्यूटर के कार्यों को नियंत्रित और निर्देशित करना", "केवल डेटा स्टोर करना", "केवल प्रिंट करना", "केवल इंटरनेट चलाना"], a: 0 },
+                    { q: "RAM किस प्रकार की Memory है?", options: ["Volatile Memory", "Permanent Memory", "Optical Memory", "External Memory"], a: 0 },
+                    { q: "ROM का पूरा नाम क्या है?", options: ["Read Only Memory", "Random Only Memory", "Read Open Memory", "Random Output Memory"], a: 0 },
+                    { q: "RAM में संग्रहीत डेटा कब मिट जाता है?", options: ["कंप्यूटर बंद होने पर", "कंप्यूटर चालू होने पर", "प्रिंटर चलाने पर", "माउस चलाने पर"], a: 0 },
+                    { q: "निम्न में से कौन Primary Memory का उदाहरण है?", options: ["RAM", "Hard Disk", "Pen Drive", "CD"], a: 0 },
+                    { q: "निम्न में से कौन Secondary Storage का उदाहरण है?", options: ["Hard Disk", "RAM", "ROM", "Cache"], a: 0 },
+                    { q: "SSD का पूरा नाम क्या है?", options: ["Solid State Drive", "System State Drive", "Solid Storage Disk", "System Storage Device"], a: 0 },
+                    { q: "Keyboard किस प्रकार का Device है?", options: ["Input Device", "Output Device", "Storage Device", "Processing Device"], a: 0 },
+                    { q: "Mouse किस प्रकार का Device है?", options: ["Input Device", "Output Device", "Storage Device", "Processing Device"], a: 0 },
+                    { q: "Monitor किस प्रकार का Device है?", options: ["Input Device", "Output Device", "Storage Device", "Processing Device"], a: 1 },
+                    { q: "Printer किस प्रकार का Device है?", options: ["Input Device", "Output Device", "Storage Device", "Processing Device"], a: 1 },
+                    { q: "Scanner का उपयोग किसलिए किया जाता है?", options: ["कागज की जानकारी को डिजिटल रूप में लेने के लिए", "आवाज निकालने के लिए", "वीडियो दिखाने के लिए", "डेटा प्रिंट करने के लिए"], a: 0 },
+                    { q: "Input Device का मुख्य कार्य क्या है?", options: ["कंप्यूटर में डेटा और निर्देश देना", "परिणाम दिखाना", "डेटा प्रिंट करना", "बिजली देना"], a: 0 },
+                    { q: "Output Device का मुख्य कार्य क्या है?", options: ["प्रोसेस किए गए परिणाम को प्रस्तुत करना", "डेटा दर्ज करना", "डेटा स्टोर करना", "प्रोग्राम बनाना"], a: 0 },
+                    { q: "Motherboard क्या है?", options: ["मुख्य सर्किट बोर्ड", "एक सॉफ्टवेयर", "एक प्रिंटर", "एक ऑपरेटिंग सिस्टम"], a: 0 },
+                    { q: "कंप्यूटर में डेटा मुख्य रूप से किस भाषा में प्रोसेस होता है?", options: ["Binary", "Decimal", "Roman", "Hindi"], a: 0 },
+                    { q: "1 Byte में कितने Bits होते हैं?", options: ["4", "8", "16", "32"], a: 1 },
+                    { q: "1 KB में कितने Bytes होते हैं?", options: ["100", "512", "1024", "2048"], a: 2 },
+                    { q: "कंप्यूटर की Memory को सामान्यतः किस इकाई में मापा जाता है?", options: ["Byte", "Meter", "Liter", "Volt"], a: 0 },
+                    { q: "Hardware क्या है?", options: ["कंप्यूटर के भौतिक भाग", "कंप्यूटर के प्रोग्राम", "इंटरनेट सेवा", "डेटा का नाम"], a: 0 },
+                    { q: "Software क्या है?", options: ["निर्देशों और प्रोग्रामों का समूह", "कंप्यूटर का भौतिक भाग", "बिजली का उपकरण", "केवल Keyboard"], a: 0 },
+                    { q: "निम्न में से कौन System Software का उदाहरण है?", options: ["Windows", "MS Word", "Calculator", "Paint"], a: 0 },
+                    { q: "निम्न में से कौन Application Software का उदाहरण है?", options: ["MS Word", "BIOS", "Device Driver", "Operating System"], a: 0 },
+                    { q: "Operating System का मुख्य कार्य क्या है?", options: ["Hardware और Software के बीच समन्वय करना", "केवल गेम चलाना", "केवल प्रिंट करना", "केवल इंटरनेट देना"], a: 0 },
+                    { q: "Cache Memory की मुख्य विशेषता क्या है?", options: ["यह तेज गति की Memory है", "यह केवल बाहरी Storage है", "यह केवल प्रिंटर में होती है", "यह एक Output Device है"], a: 0 },
+                    { q: "निम्न में से कौन Storage Device है?", options: ["Pen Drive", "Keyboard", "Monitor", "Mouse"], a: 0 },
+                    { q: "CD का पूरा नाम क्या है?", options: ["Compact Disc", "Computer Disc", "Central Disc", "Compact Data"], a: 0 },
+                    { q: "USB का पूरा नाम क्या है?", options: ["Universal Serial Bus", "Universal System Bus", "United Serial Bus", "User Serial Board"], a: 0 },
+                    { q: "Booting का अर्थ क्या है?", options: ["कंप्यूटर को शुरू करने की प्रक्रिया", "कंप्यूटर बंद करने की प्रक्रिया", "फाइल प्रिंट करने की प्रक्रिया", "फाइल डिलीट करने की प्रक्रिया"], a: 0 }
                 ]},
             ],
             'RS-CFA': [
@@ -2550,10 +2531,6 @@ a.everest-force-back {
             onlineResults: [],
             onlineResultsLoading: false,
             onlineResultsError: '',
-            onlineStudents: [],
-            onlineStudentsLoading: false,
-            onlineStudentsError: '',
-            studentSearch: '',
             selectedOnlineResult: null,
             modal: null,
             notePage: 0,
@@ -2736,9 +2713,6 @@ a.everest-force-back {
                     if ((tab === 'adminResults' || tab === 'adminDashboard') && appState.isAdmin) {
                         setTimeout(() => actions.loadOnlineResults(), 0);
                     }
-                    if (tab === 'adminStudents' && appState.isAdmin) {
-                        setTimeout(() => actions.loadOnlineStudents(), 0);
-                    }
                     if(params && params.course !== undefined) appState.activeCourse = params.course;
                     if(params && params.chapter !== undefined) appState.activeChapter = params.chapter;
                     if(params && params.handwrittenChapter !== undefined) appState.activeHandwrittenChapter = params.handwrittenChapter;
@@ -2824,21 +2798,13 @@ a.everest-force-back {
                     }
                     appState.currentUser = user;
                     try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
-
-                    // Save verified real students for the Admin-only Student List.
-                    // The fictional Firebase test number is intentionally excluded.
-                    if (!user.testMode && window.EverestFirebase?.saveStudent) {
-                        window.EverestFirebase.saveStudent(user).catch((err) => {
-                            console.error("Firebase student save failed:", err);
-                        });
-                    }
-
                     window.__everestOtpConfirmation = null;
                     window.__everestTestOtpMode = false;
                     window.__everestStudentName = '';
                     window.__everestStudentMobile = '';
-                    const todayIdx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson1');
+                    const todayIdx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
                     if (todayIdx >= 0) {
+                        window.__everestReturnToTodayTest = false;
                         actions.startTest('RS-CIT', todayIdx);
                     } else {
                         actions.setTab('studentDashboard');
@@ -2912,27 +2878,6 @@ a.everest-force-back {
                     render();
                 }
             },
-            loadOnlineStudents: async () => {
-                if (!appState.isAdmin) return;
-                appState.onlineStudentsLoading = true;
-                appState.onlineStudentsError = '';
-                render();
-                try {
-                    const rows = await window.EverestFirebase.getStudents();
-                    appState.onlineStudents = rows.sort((a, b) => {
-                        const da = a.updatedAt?.seconds || 0;
-                        const dbb = b.updatedAt?.seconds || 0;
-                        return dbb - da;
-                    });
-                } catch (err) {
-                    console.error("Firebase student list load failed:", err);
-                    appState.onlineStudentsError = "Student List load नहीं हो पाई। Firestore Rules/Internet check करें।";
-                } finally {
-                    appState.onlineStudentsLoading = false;
-                    render();
-                }
-            },
-
             copyTodayResults: async () => {
                 if (!appState.isAdmin) return;
 
@@ -3075,14 +3020,18 @@ a.everest-force-back {
             },
 
             startTodayTest: () => {
-                if (!appState.currentUser || !appState.currentUser.name) {
-                    alert("📱 पहले Student Login करके OTP Verify करें।");
-                    actions.setTab('studentLogin');
+                // If the student is already verified, start Today's Test directly.
+                if (appState.currentUser && appState.currentUser.name) {
+                    const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
+                    if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
+                    actions.startTest('RS-CIT', idx);
                     return;
                 }
-                const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson1');
-                if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
-                actions.startTest('RS-CIT', idx);
+
+                // Remember that the student came specifically for Today's Test.
+                window.__everestReturnToTodayTest = true;
+                alert("📱 पहले Student Login करके OTP Verify करें।");
+                actions.setTab('studentLogin');
             },
             startTest: (cat, idx) => {
                 appState.testState = { activeTest: db.mockTests[cat][idx], currentQ: 0, answers: {}, submitted: false, results: null };
@@ -3550,20 +3499,12 @@ a.everest-force-back {
                         <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;">आगामी RS-CIT परीक्षा 11 अक्टूबर को होने वाली है। सभी विद्यार्थी अपनी परीक्षा की तैयारी पूरी रखें और Daily Test तथा Mock Test जरूर दें।</div>
                     </div>
 
-                    <!-- TODAY ONLY: RSCIT LIVE CLASS DAY 3 -->
-                    <div style="background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:2px solid #6366f1;border-radius:20px;padding:16px;box-shadow:0 10px 24px rgba(79,70,229,.14);">
-                        <div style="font-size:18px;font-weight:900;color:#4338ca;margin-bottom:6px;">🔴 आज की LIVE CLASS</div>
-                        <div style="font-size:16px;font-weight:900;color:#111827;margin-bottom:5px;">RSCIT LIVE CLASS – DAY 3</div>
-                        <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;margin-bottom:12px;">🎯 11 अक्टूबर 2026 RSCIT परीक्षा की तैयारी • TYARI JEET KI</div>
-                        <a href="https://youtube.com/live/-IYOb9oaBHk?feature=share" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;text-decoration:none;padding:12px 16px;border-radius:14px;font-weight:900;font-size:14px;box-shadow:0 6px 14px rgba(220,38,38,.22);">▶️ LIVE CLASS देखें</a>
-                    </div>
-
                     <!-- TODAY'S DAILY TEST -->
                     <div class="today-test-card">
                         <div class="today-test-badge">📢 TODAY TEST</div>
                         <h2>आज का टेस्ट जरूर दें!</h2>
                         <p>चेक करें अपना <b>Computer ज्ञान</b> 💻🧠</p>
-                        <div class="today-test-title">LESSON 1 – INTRODUCTION TO COMPUTER</div>
+                        <div class="today-test-title">LESSON 2 – COMPUTER SYSTEM</div>
                         <div class="today-test-meta">📝 35 Important Questions &nbsp; • &nbsp; 🎯 RS-CIT Exam Practice</div>
                         <button onclick="actions.startTodayTest()" class="today-test-btn">🚀 START TODAY TEST ${ICONS.arrowRight}</button>
                     </div>
@@ -4638,9 +4579,12 @@ studentDashboard: () => `
                         <div class="w-16 h-16 bg-white rounded-full p-1"><img src="${IMAGES.logo}" alt="Logo" class="rounded-full" /></div>
                         <div>
                             <h2 class="font-black text-xl mb-1">${appState.currentUser.name}</h2>
-                            <p class="text-brand-300 text-xs font-bold">ID: ${appState.currentUser.id} • ${appState.currentUser.course}</p>
+                            <p class="text-brand-300 text-xs font-bold">📱 ${appState.currentUser.mobile || appState.currentUser.phoneNumber || "Mobile Verified"}</p>
                         </div>
                     </div>
+                    <button onclick="actions.startTodayTest()" class="today-test-btn" style="margin-top:0;">
+                        🚀 TODAY TEST शुरू करें ${ICONS.arrowRight}
+                    </button>
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="actions.setTab('home')" class="bg-white p-4 rounded-2xl border shadow-sm flex flex-col items-center gap-2">${ICONS.home} <span class="text-[10px] font-bold">HOME</span></button>
                         <button onclick="actions.setTab('courses')" class="bg-white p-4 rounded-2xl border shadow-sm flex flex-col items-center gap-2">${ICONS.courses} <span class="text-[10px] font-bold">COURSES</span></button>
@@ -4729,7 +4673,6 @@ studentDashboard: () => `
                         <button onclick="actions.setTab('adminQuestions')" class="admin-card"><div class="admin-icon bg-green-50 text-green-600">${ICONS.study}</div><span class="text-xs font-black">Questions</span><small class="text-[9px] text-gray-400 font-bold">Question Bank</small></button>
                         <button onclick="actions.setTab('adminTests')" class="admin-card"><div class="admin-icon bg-purple-50 text-purple-600">${ICONS.test}</div><span class="text-xs font-black">Test Setup</span><small class="text-[9px] text-gray-400 font-bold">Daily Test</small></button>
                         <button onclick="actions.setTab('adminResults')" class="admin-card"><div class="admin-icon bg-orange-50 text-orange-600">${ICONS.check}</div><span class="text-xs font-black">Results</span><small class="text-[9px] text-gray-400 font-bold">Live Results</small></button>
-                        <button onclick="actions.setTab('adminStudents')" class="admin-card"><div class="admin-icon bg-cyan-50 text-cyan-600">👨‍🎓</div><span class="text-xs font-black">Student List</span><small class="text-[9px] text-gray-400 font-bold">OTP Verified Students</small></button>
                         <button onclick="actions.setTab('adminPdfs')" class="admin-card"><div class="admin-icon bg-red-50 text-red-600">${ICONS.study}</div><span class="text-xs font-black">PDF Manager</span><small class="text-[9px] text-gray-400 font-bold">Study PDFs</small></button>
                         <button onclick="actions.setTab('adminContact')" class="admin-card"><div class="admin-icon bg-yellow-50 text-yellow-600">${ICONS.contact}</div><span class="text-xs font-black">Contact Info</span><small class="text-[9px] text-gray-400 font-bold">Institute Details</small></button>
                     </div>
@@ -4822,106 +4765,6 @@ studentDashboard: () => `
                     <button onclick="actions.setTab('adminDashboard')" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold">BACK</button>
                 </div>
             `,
-
-            adminStudents: () => {
-                const allStudents = Array.isArray(appState.onlineStudents) ? appState.onlineStudents : [];
-                const search = String(appState.studentSearch || '').trim().toLowerCase();
-                const rows = search
-                    ? allStudents.filter(s =>
-                        String(s.name || '').toLowerCase().includes(search) ||
-                        String(s.mobile || s.phoneNumber || '').toLowerCase().includes(search) ||
-                        String(s.uid || '').toLowerCase().includes(search)
-                    )
-                    : allStudents;
-
-                const fmtTime = (student) => {
-                    if (student.updatedAt?.seconds) {
-                        return new Date(student.updatedAt.seconds * 1000).toLocaleString('en-IN', {
-                            day: '2-digit', month: '2-digit', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit'
-                        });
-                    }
-                    return '-';
-                };
-
-                return `
-                <div class="p-4 fade-in space-y-5 pb-32">
-                    <div class="bg-gradient-to-r from-cyan-700 to-blue-700 text-white rounded-3xl p-5 shadow-xl">
-                        <div class="flex justify-between items-center gap-3">
-                            <div>
-                                <h2 class="font-black text-xl">👨‍🎓 STUDENT LIST</h2>
-                                <p class="text-cyan-100 text-[10px] font-bold mt-1 uppercase tracking-widest">ADMIN ONLY • Firebase Students</p>
-                            </div>
-                            <button onclick="actions.loadOnlineStudents()" class="bg-white/15 px-3 py-2 rounded-xl text-xs font-black">🔄 REFRESH</button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-cyan-50 border border-cyan-100 rounded-2xl p-4 text-center">
-                            <div class="text-2xl font-black text-cyan-700">${allStudents.length}</div>
-                            <div class="text-[10px] font-black text-cyan-800 uppercase">Total Students</div>
-                        </div>
-                        <div class="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
-                            <div class="text-2xl font-black text-green-700">${rows.length}</div>
-                            <div class="text-[10px] font-black text-green-800 uppercase">Showing</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl border shadow-sm p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">🔎</span>
-                            <input
-                                value="${String(appState.studentSearch || '').replace(/"/g, '&quot;')}"
-                                oninput="appState.studentSearch=this.value; render()"
-                                class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm outline-none"
-                                placeholder="Student Name / Mobile / UID से Search करें"
-                            />
-                        </div>
-                    </div>
-
-                    ${appState.onlineStudentsLoading ? `
-                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
-                            <p class="font-black text-blue-800">⏳ Firebase से Student List ला रहे हैं...</p>
-                        </div>
-                    ` : ''}
-
-                    ${appState.onlineStudentsError ? `
-                        <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
-                            <p class="font-black text-red-800 text-sm">${appState.onlineStudentsError}</p>
-                        </div>
-                    ` : ''}
-
-                    <div class="space-y-3">
-                        ${rows.length ? rows.map((student, idx) => `
-                            <div class="bg-white p-4 rounded-2xl border shadow-sm">
-                                <div class="flex justify-between items-start gap-3">
-                                    <div class="min-w-0">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center text-[10px] font-black">${idx + 1}</span>
-                                            <div class="text-sm font-black text-gray-800 uppercase truncate">${String(student.name || 'Unknown Student')}</div>
-                                        </div>
-                                        <div class="mt-3 space-y-2 text-xs">
-                                            <div><span class="font-black text-gray-400">📱 MOBILE:</span> <span class="font-bold text-gray-700">${String(student.mobile || student.phoneNumber || '-')}</span></div>
-                                            <div><span class="font-black text-gray-400">🆔 UID:</span> <span class="font-bold text-gray-700 break-all">${String(student.uid || student.firebaseId || '-')}</span></div>
-                                            <div><span class="font-black text-gray-400">🕐 LOGIN:</span> <span class="font-bold text-gray-700">${fmtTime(student)}</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0 bg-green-100 text-green-800 px-2 py-1 rounded-lg text-[9px] font-black">✅ OTP VERIFIED</div>
-                                </div>
-                            </div>
-                        `).join('') : `
-                            <div class="bg-white rounded-3xl border p-8 text-center">
-                                <div class="text-4xl mb-3">👨‍🎓</div>
-                                <p class="font-black text-gray-700">${allStudents.length ? 'Search करने पर कोई Student नहीं मिला।' : 'अभी कोई verified student record नहीं मिला।'}</p>
-                                <p class="text-xs text-gray-400 font-bold mt-2">Real OTP verify होने के बाद student यहाँ दिखाई देगा।</p>
-                            </div>
-                        `}
-                    </div>
-
-                    <button onclick="actions.setTab('adminDashboard')" class="w-full py-3 bg-gray-100 rounded-xl font-bold">← BACK TO ADMIN</button>
-                </div>
-                `;
-            },
 
             adminResults: () => {
                 const rows = appState.onlineResults || [];
@@ -6878,7 +6721,6 @@ studentDashboard: () => `
                 case 'adminQuestions': main = UI.adminQuestions(); break;
                 case 'adminTests': main = UI.adminTests(); break;
                 case 'adminResults': main = UI.adminResults(); break;
-                case 'adminStudents': main = UI.adminStudents(); break;
                 case 'adminAnswerSheet': main = UI.adminAnswerSheet(); break;
                 case 'adminPdfs': main = UI.adminPdfs(); break;
                 case 'adminContact': main = UI.adminContact(); break;
