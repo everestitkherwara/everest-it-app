@@ -2710,7 +2710,7 @@ a.everest-force-back {
                     appState.activeTab = 'adminLogin';
                 } else {
                     appState.activeTab = tab;
-                    if ((tab === 'adminResults' || tab === 'adminDashboard') && appState.isAdmin) {
+                    if ((tab === 'adminResults' || tab === 'adminDashboard' || tab === 'adminStudents') && appState.isAdmin) {
                         setTimeout(() => actions.loadOnlineResults(), 0);
                     }
                     if(params && params.course !== undefined) appState.activeCourse = params.course;
@@ -3499,12 +3499,12 @@ a.everest-force-back {
                         <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;">आगामी RS-CIT परीक्षा 11 अक्टूबर को होने वाली है। सभी विद्यार्थी अपनी परीक्षा की तैयारी पूरी रखें और Daily Test तथा Mock Test जरूर दें।</div>
                     </div>
 
-                    <!-- TODAY ONLY: RSCIT LIVE CLASS DAY 3 -->
+                    <!-- TODAY ONLY: RSCIT LIVE CLASS DAY 4 -->
 <div style="background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:2px solid #6366f1;border-radius:20px;padding:16px;box-shadow:0 10px 24px rgba(79,70,229,.14);">
     <div style="font-size:18px;font-weight:900;color:#4338ca;margin-bottom:6px;">📢 आज की ONLINE LIVE CLASS</div>
-    <div style="font-size:15px;font-weight:900;color:#111827;margin-bottom:6px;">RSCIT LIVE CLASS — DAY 3</div>
-    <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;margin-bottom:12px;">📅 11 अक्टूबर 2026 RSCIT परीक्षा की तैयारी — TYARI JEET KI</div>
-    <a href="https://youtube.com/live/-IYOb9oaBHk?feature=share" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;text-decoration:none;padding:12px 16px;border-radius:14px;font-weight:900;font-size:14px;box-shadow:0 6px 14px rgba(220,38,38,.22);">▶️ LIVE CLASS में शामिल हों</a>
+    <div style="font-size:15px;font-weight:900;color:#111827;margin-bottom:6px;">RSCIT LIVE CLASS — DAY 4</div>
+    <div style="font-size:13px;font-weight:700;color:#4b5563;line-height:1.55;margin-bottom:12px;">📅 1 अक्टूबर 2026 RSCIT परीक्षा की तैयारी — TYARI JEET KI</div>
+    <a href="https://youtube.com/live/NrbN-sWMeS4?feature=share" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;text-decoration:none;padding:12px 16px;border-radius:14px;font-weight:900;font-size:14px;box-shadow:0 6px 14px rgba(220,38,38,.22);">▶️ LIVE CLASS में शामिल हों</a>
 </div>
 
 <!-- TODAY'S DAILY TEST -->
@@ -4681,6 +4681,7 @@ studentDashboard: () => `
                         <button onclick="actions.setTab('adminQuestions')" class="admin-card"><div class="admin-icon bg-green-50 text-green-600">${ICONS.study}</div><span class="text-xs font-black">Questions</span><small class="text-[9px] text-gray-400 font-bold">Question Bank</small></button>
                         <button onclick="actions.setTab('adminTests')" class="admin-card"><div class="admin-icon bg-purple-50 text-purple-600">${ICONS.test}</div><span class="text-xs font-black">Test Setup</span><small class="text-[9px] text-gray-400 font-bold">Daily Test</small></button>
                         <button onclick="actions.setTab('adminResults')" class="admin-card"><div class="admin-icon bg-orange-50 text-orange-600">${ICONS.check}</div><span class="text-xs font-black">Results</span><small class="text-[9px] text-gray-400 font-bold">Live Results</small></button>
+                        <button onclick="actions.setTab('adminStudents')" class="admin-card"><div class="admin-icon bg-blue-50 text-blue-600">${ICONS.admin}</div><span class="text-xs font-black">Student List</span><small class="text-[9px] text-gray-400 font-bold">All Students</small></button>
                         <button onclick="actions.setTab('adminPdfs')" class="admin-card"><div class="admin-icon bg-red-50 text-red-600">${ICONS.study}</div><span class="text-xs font-black">PDF Manager</span><small class="text-[9px] text-gray-400 font-bold">Study PDFs</small></button>
                         <button onclick="actions.setTab('adminContact')" class="admin-card"><div class="admin-icon bg-yellow-50 text-yellow-600">${ICONS.contact}</div><span class="text-xs font-black">Contact Info</span><small class="text-[9px] text-gray-400 font-bold">Institute Details</small></button>
                     </div>
@@ -4773,6 +4774,71 @@ studentDashboard: () => `
                     <button onclick="actions.setTab('adminDashboard')" class="w-full mt-6 py-3 bg-gray-100 rounded-xl font-bold">BACK</button>
                 </div>
             `,
+
+            adminStudents: () => {
+                const rows = Array.isArray(appState.onlineResults) ? appState.onlineResults : [];
+                const map = new Map();
+
+                rows.forEach(r => {
+                    const name = String(r.studentName || 'Unknown Student').trim();
+                    const mobile = String(r.mobile || r.phone || r.phoneNumber || '').trim();
+                    const key = (mobile || name).toLowerCase();
+                    if (!map.has(key)) {
+                        map.set(key, { name, mobile, attempts: 0, lastTest: '', percentage: 0, latest: 0 });
+                    }
+                    const st = map.get(key);
+                    st.attempts += 1;
+                    st.lastTest = String(r.testTitle || 'Daily Test');
+                    st.percentage = Number(r.percentage || 0);
+                    st.latest = r.submittedAt?.seconds ? r.submittedAt.seconds : (Date.parse(r.date || '') || 0) / 1000;
+                });
+
+                const students = Array.from(map.values()).sort((a,b) => b.latest - a.latest);
+
+                return `
+                <div class="p-4 fade-in space-y-5 pb-32">
+                    <div class="bg-gradient-to-br from-blue-800 to-indigo-700 text-white rounded-3xl p-5 shadow-xl">
+                        <div class="flex justify-between items-center gap-3">
+                            <div>
+                                <h2 class="font-black text-xl">👨‍🎓 STUDENT LIST</h2>
+                                <p class="text-blue-100 text-[10px] font-bold mt-1 uppercase tracking-widest">EVEREST IT • Online Students</p>
+                            </div>
+                            <button onclick="actions.loadOnlineResults()" class="bg-white/15 text-white px-3 py-2 rounded-xl text-xs font-black">🔄 REFRESH</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+                        <div class="text-3xl font-black text-blue-700">${students.length}</div>
+                        <div class="text-[10px] font-black text-blue-800 uppercase">Unique Students</div>
+                    </div>
+
+                    ${students.length ? students.map((st, idx) => `
+                        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-black shrink-0">${idx + 1}</div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-black text-sm text-gray-800">${st.name}</div>
+                                    <div class="text-[11px] font-bold text-gray-500 mt-1">📱 ${st.mobile || 'Mobile number not available'}</div>
+                                    <div class="flex flex-wrap gap-2 mt-2">
+                                        <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-[9px] font-black">📝 ${st.attempts} Attempt${st.attempts > 1 ? 's' : ''}</span>
+                                        <span class="bg-green-50 text-green-700 px-2 py-1 rounded-lg text-[9px] font-black">🎯 ${st.percentage}%</span>
+                                    </div>
+                                    <div class="text-[9px] text-gray-400 font-bold mt-2">${st.lastTest}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('') : `
+                        <div class="bg-white border rounded-3xl p-8 text-center">
+                            <div class="text-4xl mb-3">👨‍🎓</div>
+                            <p class="font-black text-gray-700">अभी कोई Student Result उपलब्ध नहीं है।</p>
+                            <p class="text-[10px] text-gray-400 font-bold mt-2">पहले Refresh करें या विद्यार्थियों से Test submit करवाएँ।</p>
+                        </div>
+                    `}
+
+                    <button onclick="actions.setTab('adminDashboard')" class="w-full py-3 bg-gray-100 rounded-xl font-bold">BACK TO ADMIN PANEL</button>
+                </div>
+                `;
+            },
 
             adminResults: () => {
                 const rows = appState.onlineResults || [];
@@ -6729,6 +6795,7 @@ studentDashboard: () => `
                 case 'adminQuestions': main = UI.adminQuestions(); break;
                 case 'adminTests': main = UI.adminTests(); break;
                 case 'adminResults': main = UI.adminResults(); break;
+                case 'adminStudents': main = UI.adminStudents(); break;
                 case 'adminAnswerSheet': main = UI.adminAnswerSheet(); break;
                 case 'adminPdfs': main = UI.adminPdfs(); break;
                 case 'adminContact': main = UI.adminContact(); break;
