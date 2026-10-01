@@ -537,8 +537,8 @@ a.everest-force-back {
 
     <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, getDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, signOut, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA9ZDZ3gsiyWsecs22WSH9rZZOx9qQe55Y",
@@ -578,42 +578,66 @@ a.everest-force-back {
     },
     onAdminAuthChanged: (callback) => onAuthStateChanged(auth, callback),
 
-    createPhoneRecaptcha: async (phone) => {
-       if (window.__everestRecaptchaVerifier) {
-         try { window.__everestRecaptchaVerifier.clear(); } catch (_) {}
-         window.__everestRecaptchaVerifier = null;
-       }
-       // ONLY the Firebase fictional test number uses testing app-verification bypass.
-       auth.settings.appVerificationDisabledForTesting = (phone === "+16505553434");
-       window.__everestRecaptchaVerifier = new RecaptchaVerifier(auth, "studentSendOtpBtn", { size: "invisible" });
-       return window.__everestRecaptchaVerifier;
-     },
-     sendStudentOtp: async (phone) => {
-       // Development-only fallback for the Firebase fictional test number.
-       // Firebase documents fictional numbers as a no-SMS test path. If this
-       // project still returns auth/billing-not-enabled, keep the UI testable
-       // without enabling billing. Real numbers continue through Firebase SMS.
-       if (phone === "+16505553434") {
-         window.__everestTestOtpMode = true;
-         return { __everestTestOtp: true };
-       }
-       window.__everestTestOtpMode = false;
-       const verifier = await window.EverestFirebase.createPhoneRecaptcha(phone);
-       return await signInWithPhoneNumber(auth, phone, verifier);
-     },
-
     saveTestResult: async (result) => {
+      const student = window.__everestStudentSession || {};
       const payload = {
         ...result,
+        studentName: student.name || result.studentName || result.name || "Student",
+        studentMobile: student.mobile || result.studentMobile || result.mobile || "",
+        studentKey: student.mobile || result.studentMobile || result.mobile || result.uid || "",
         submittedAt: serverTimestamp(),
         source: "EVEREST IT STUDENT APP"
       };
-      return await addDoc(collection(firestore, "testResults"), payload);
+      const saved = await addDoc(collection(firestore, "testResults"), payload);
+      try { await window.EverestFirebase.saveStudentActivity({ type: 'test', title: 'Test Submit', details: `${result.testTitle || result.testId || 'Test'} • ${result.score ?? 0}/${result.total ?? result.totalQuestions ?? 0} • ${result.percentage ?? 0}%`, student }); } catch (_) {}
+      return saved;
     },
 
     getTestResults: async () => {
       const snap = await getDocs(collection(firestore, "testResults"));
-      return snap.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
+    },
+
+    saveStudent: async (student) => {
+      const mobile = String(student?.mobile || student?.phoneNumber || '').replace(/\D/g, '');
+      if (!/^\d{10}$/.test(mobile)) throw new Error("Student mobile missing or invalid.");
+      const ref = doc(firestore, "students", 'mobile_' + mobile);
+      const existing = await getDoc(ref);
+      const old = existing.exists() ? existing.data() : {};
+      const payload = {
+        uid: student.uid || old.uid || ('student-' + mobile),
+        name: student.name || old.name || "Student",
+        mobile,
+        phoneNumber: '+91' + mobile,
+        firstLoginAt: old.firstLoginAt || serverTimestamp(),
+        lastLoginAt: serverTimestamp(),
+        loginCount: Number(old.loginCount || 0) + 1,
+        source: "EVEREST IT STUDENT APP"
+      };
+      await setDoc(ref, payload, { merge: true });
+      return ref;
+    },
+
+    saveStudentActivity: async ({type, title, details, student} = {}) => {
+      const s = student || window.__everestStudentSession || {};
+      const mobile = String(s.mobile || s.phoneNumber || '').replace(/\D/g, '');
+      if (!/^\d{10}$/.test(mobile)) return null;
+      return await addDoc(collection(firestore, "studentActivity"), {
+        studentName: s.name || 'Student', studentMobile: mobile, studentKey: mobile,
+        type: type || 'activity', title: title || 'Activity', details: details || '',
+        createdAt: serverTimestamp(), source: 'EVEREST IT STUDENT APP'
+      });
+    },
+
+    getStudentActivity: async (mobile) => {
+      const snap = await getDocs(collection(firestore, "studentActivity"));
+      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }))
+        .filter(x => String(x.studentMobile || '').replace(/\D/g, '') === String(mobile || '').replace(/\D/g, ''));
+    },
+
+    getStudents: async () => {
+      const snap = await getDocs(collection(firestore, "students"));
+      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
     }
   };
 </script>
@@ -2531,7 +2555,12 @@ a.everest-force-back {
             onlineResults: [],
             onlineResultsLoading: false,
             onlineResultsError: '',
+            onlineStudents: [],
+            onlineStudentsLoading: false,
+            onlineStudentsError: '',
+            studentSearch: '',
             selectedOnlineResult: null,
+            studentHistory: null,
             modal: null,
             notePage: 0,
             activeHandwrittenChapter: null,
@@ -2547,7 +2576,7 @@ a.everest-force-back {
             const savedStudent = localStorage.getItem('everestStudent');
             if (savedStudent) {
                 const parsedStudent = JSON.parse(savedStudent);
-                if (parsedStudent && parsedStudent.name) appState.currentUser = parsedStudent;
+                if (parsedStudent && parsedStudent.name) { appState.currentUser = parsedStudent; window.__everestStudentSession = parsedStudent; }
             }
         } catch (_) {}
 
@@ -2710,8 +2739,15 @@ a.everest-force-back {
                     appState.activeTab = 'adminLogin';
                 } else {
                     appState.activeTab = tab;
-                    if ((tab === 'adminResults' || tab === 'adminDashboard' || tab === 'adminStudents') && appState.isAdmin) {
+                    if (appState.currentUser && !String(tab).startsWith('admin') && tab !== 'studentLogin') {
+                        const labels = {studentDashboard:'Student Dashboard',courses:'Courses',study:'Study Material',oldPapers:'Old Papers',mocktest:'Mock Test',lessonContent:'Lesson Content',handwrittenList:'Handwritten Notes',handwrittenViewer:'Handwritten Notes',contact:'Contact'};
+                        window.EverestFirebase?.saveStudentActivity?.({type:'navigation', title: labels[tab] || tab, details: 'App section opened', student: appState.currentUser}).catch(()=>{});
+                    }
+                    if ((tab === 'adminResults' || tab === 'adminDashboard') && appState.isAdmin) {
                         setTimeout(() => actions.loadOnlineResults(), 0);
+                    }
+                    if (tab === 'adminStudents' && appState.isAdmin) {
+                        setTimeout(() => actions.loadOnlineStudents(), 0);
                     }
                     if(params && params.course !== undefined) appState.activeCourse = params.course;
                     if(params && params.chapter !== undefined) appState.activeChapter = params.chapter;
@@ -2732,86 +2768,64 @@ a.everest-force-back {
                 e.preventDefault();
                 const name = document.getElementById('studentName')?.value?.trim() || '';
                 const mobileRaw = document.getElementById('studentMobile')?.value?.trim() || '';
+                const mobile = mobileRaw.replace(/\D/g, '');
                 if (!name) { alert("कृपया अपना पूरा नाम लिखें।"); return; }
-                const phone = mobileRaw.startsWith('+') ? mobileRaw.replace(/[^+\d]/g, '') : (/^\d{10}$/.test(mobileRaw) ? '+91' + mobileRaw : '');
-                if (!/^\+\d{10,15}$/.test(phone)) { alert("कृपया 10 अंकों का Indian Mobile Number या +CountryCode वाला Test Number डालें।"); return; }
+                if (!/^\d{10}$/.test(mobile)) { alert("कृपया 10 अंकों का Indian Mobile Number डालें।"); return; }
+                const user = {
+                    name,
+                    mobile,
+                    phoneNumber: '+91' + mobile,
+                    uid: 'student-' + mobile
+                };
+                // Firebase Phone OTP is intentionally removed. Use Anonymous Auth only to
+                // give the student a Firebase-authenticated session so existing Firestore
+                // rules can save Student + Activity + Test History without SMS/billing.
                 try {
-                    const confirmation = await window.EverestFirebase.sendStudentOtp(phone);
-                    window.__everestOtpConfirmation = confirmation;
-                    window.__everestStudentName = name;
-                    window.__everestStudentMobile = mobileRaw;
-                    if (window.__everestTestOtpMode) {
-                        alert("🧪 TEST MODE\nइस fictional test number पर असली SMS नहीं भेजा जाएगा।\nTest OTP: 654321");
-                    } else {
-                        alert("📱 OTP भेजा जा रहा है\n" + phone + " पर SMS आने के बाद OK दबाएँ।");
+                    if (!auth.currentUser) {
+                        await signInAnonymously(auth);
                     }
-                    actions.showStudentOtp();
+                } catch (authErr) {
+                    console.error('Anonymous Auth failed:', authErr);
+                    alert('⚠️ Login नहीं हो पाया। Firebase में Anonymous sign-in ON करें।');
+                    return;
+                }
+                appState.currentUser = user;
+                window.__everestStudentSession = user;
+                try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
+                try {
+                    await window.EverestFirebase.saveStudent(user);
+                    await window.EverestFirebase.saveStudentActivity({ type: 'login', title: 'Student Login', details: 'App में Login किया', student: user });
                 } catch (err) {
-                    console.error('Student OTP error:', err);
-                    const code = err?.code || '';
-                    if (window.__everestRecaptchaVerifier) {
-                        try { window.__everestRecaptchaVerifier.clear(); } catch (_) {}
-                        window.__everestRecaptchaVerifier = null;
-                    }
-                    if (code === 'auth/operation-not-allowed') {
-                        alert("❌ Firebase Phone Auth/SMS अभी अनुमति नहीं है। Firebase Console में Phone provider और SMS region policy check करें।");
-                    } else if (code === 'auth/invalid-phone-number') {
-                        alert("❌ Mobile Number सही नहीं है। 10 अंकों का Indian number डालें।");
-                    } else if (code === 'auth/quota-exceeded') {
-                        alert("⚠️ SMS quota समाप्त हो गया है। बाद में फिर try करें।");
-                    } else if (code === 'auth/captcha-check-failed') {
-                        alert("❌ reCAPTCHA verification failed. Page को Ctrl+F5 से refresh करके फिर try करें।");
-                    } else {
-                        alert("❌ OTP नहीं भेजा गया: " + (err?.message || 'Unknown error'));
+                    console.error('Student save failed:', err);
+                    alert('⚠️ Login हो गया, लेकिन Firebase में Student History save नहीं हो पाई। Firestore Rules check करें।');
+                }
+
+                if (window.__everestReturnToTodayTest) {
+                    window.__everestReturnToTodayTest = false;
+                    const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
+                    if (idx >= 0) {
+                        actions.startTest('RS-CIT', idx);
+                        return;
                     }
                 }
+                actions.setTab('studentDashboard');
             },
-            showStudentOtp: () => {
-                appState.activeTab = 'studentOtp';
-                render();
-            },
-            verifyStudentOtp: async () => {
-                const code = document.getElementById('studentOtp')?.value?.trim() || '';
-                if (!/^\d{6}$/.test(code)) { alert("कृपया 6 अंकों का OTP डालें।"); return; }
-                if (!window.__everestOtpConfirmation) { alert("पहले OTP भेजें।"); return; }
+            viewStudentHistory: async (student) => {
+                if (!appState.isAdmin) return;
+                const mobile = String(student?.mobile || student?.phoneNumber || '').replace(/\D/g, '');
+                if (!mobile) { alert('इस Student का mobile number उपलब्ध नहीं है।'); return; }
                 try {
-                    let user;
-                    if (window.__everestTestOtpMode && window.__everestOtpConfirmation.__everestTestOtp) {
-                        if (code !== "654321") {
-                            throw new Error("Test OTP गलत है। Test OTP: 654321");
-                        }
-                        user = {
-                            name: window.__everestStudentName || 'Student',
-                            mobile: window.__everestStudentMobile || '',
-                            uid: 'test-' + Date.now(),
-                            phoneNumber: window.__everestStudentMobile || '+16505553434',
-                            testMode: true
-                        };
-                    } else {
-                        const credential = await window.__everestOtpConfirmation.confirm(code);
-                        user = {
-                            name: window.__everestStudentName || 'Student',
-                            mobile: window.__everestStudentMobile || '',
-                            uid: credential.user.uid,
-                            phoneNumber: credential.user.phoneNumber || ''
-                        };
-                    }
-                    appState.currentUser = user;
-                    try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
-                    window.__everestOtpConfirmation = null;
-                    window.__everestTestOtpMode = false;
-                    window.__everestStudentName = '';
-                    window.__everestStudentMobile = '';
-                    const todayIdx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
-                    if (todayIdx >= 0) {
-                        window.__everestReturnToTodayTest = false;
-                        actions.startTest('RS-CIT', todayIdx);
-                    } else {
-                        actions.setTab('studentDashboard');
-                    }
+                    const [activity, results] = await Promise.all([
+                        window.EverestFirebase.getStudentActivity(mobile),
+                        window.EverestFirebase.getTestResults()
+                    ]);
+                    const testHistory = results.filter(r => String(r.studentMobile || r.mobile || '').replace(/\D/g, '') === mobile);
+                    appState.studentHistory = { student, activity, testHistory };
+                    appState.modal = { type: 'studentHistory', data: appState.studentHistory };
+                    render();
                 } catch (err) {
-                    console.error('Student OTP verify error:', err);
-                    alert("❌ OTP गलत है या expire हो गया है: " + (err?.message || 'Verification failed'));
+                    console.error(err);
+                    alert('Student History load नहीं हो पाई: ' + (err?.message || 'Unknown error'));
                 }
             },
             adminLogin: async (e) => {
@@ -2878,6 +2892,28 @@ a.everest-force-back {
                     render();
                 }
             },
+            loadOnlineStudents: async () => {
+                if (!appState.isAdmin) return;
+                appState.onlineStudentsLoading = true;
+                appState.onlineStudentsError = '';
+                render();
+                try {
+                    const rows = await window.EverestFirebase.getStudents();
+                    appState.onlineStudents = rows.sort((a, b) => {
+                        const da = a.updatedAt?.seconds || 0;
+                        const dbb = b.updatedAt?.seconds || 0;
+                        return dbb - da;
+                    });
+                } catch (err) {
+                    console.error("Firebase student list load failed:", err);
+                    appState.onlineStudentsError = "Student List load नहीं हो पाई। Firestore Rules/Internet check करें।";
+                } finally {
+                    appState.onlineStudentsLoading = false;
+                    render();
+                }
+            },
+
+
             copyTodayResults: async () => {
                 if (!appState.isAdmin) return;
 
@@ -3020,17 +3056,18 @@ a.everest-force-back {
             },
 
             startTodayTest: () => {
-                // If the student is already verified, start Today's Test directly.
+                const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
+                if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
+
+                // Today's Test requires only the simple Student Name + Mobile login.
                 if (appState.currentUser && appState.currentUser.name) {
-                    const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
-                    if(idx < 0) { alert("आज का Test उपलब्ध नहीं है।"); return; }
                     actions.startTest('RS-CIT', idx);
                     return;
                 }
 
                 // Remember that the student came specifically for Today's Test.
                 window.__everestReturnToTodayTest = true;
-                alert("📱 पहले Student Login करके OTP Verify करें।");
+                alert("📱 पहले Student Login करें।");
                 actions.setTab('studentLogin');
             },
             startTest: (cat, idx) => {
@@ -4494,7 +4531,7 @@ ${db.courses.map(c => `
                             <div class="everest-login-round-icon">📱</div>
                             <h2>Student Login</h2>
                             <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
-                            <div class="everest-login-tagline">नाम + Mobile Number → OTP → Login 🚀</div>
+                            <div class="everest-login-tagline">नाम + Mobile Number → Login 🚀</div>
                         </div>
                         <form onsubmit="actions.login(event)" class="space-y-5">
                             <div class="input-group">
@@ -4503,43 +4540,12 @@ ${db.courses.map(c => `
                             </div>
                             <div class="input-group">
                                 <label class="text-[10px] font-black text-gray-500 uppercase">Mobile Number</label>
-                                <input id="studentMobile" required class="input-field" inputmode="tel" autocomplete="tel" placeholder="Mobile Number / Test Number" />
+                                <input id="studentMobile" required class="input-field" inputmode="tel" autocomplete="tel" placeholder="10 अंकों का Mobile Number" />
                             </div>
-                            <div id="recaptcha-container" style="min-height:1px;width:1px;position:absolute;left:-9999px;overflow:hidden;"></div>
-                            <button id="studentSendOtpBtn" type="submit" class="everest-login-main-btn">📲 SEND OTP <span>›</span></button>
+                            <button id="studentLoginBtn" type="submit" class="everest-login-main-btn">🚀 LOGIN <span>›</span></button>
                             <button type="button" onclick="actions.setTab('login')" class="everest-login-back-btn">← Back to Home</button>
                         </form>
-                        <div class="everest-login-footer">OTP से सुरक्षित Student Login</div>
-                    </div>
-                </div>
-            `,
-
-            studentOtp: () => `
-                <div class="p-4 fade-in mt-6">
-                    <div class="everest-login-card">
-                        <div class="everest-login-brandbar">
-                            <div class="everest-login-brand-logo"><img src="${IMAGES.logo}" alt="EVEREST IT Logo" /></div>
-                            <div class="everest-login-brand-text">
-                                <div class="everest-login-brand-name">EVEREST IT ज्ञान केंद्र</div>
-                                <div class="everest-login-brand-place">खेरवाड़ा</div>
-                            </div>
-                            <div class="everest-login-brand-icon">🔐</div>
-                        </div>
-                        <div class="everest-login-heading">
-                            <div class="everest-login-round-icon">🔢</div>
-                            <h2>OTP Verify</h2>
-                            <p>OTP आपके Mobile Number पर भेजा गया है</p>
-                            <div class="everest-login-tagline">6 अंकों का OTP डालकर Login करें</div>
-                        </div>
-                        <div class="space-y-5" style="padding:0 18px;">
-                            <div class="input-group">
-                                <label class="text-[10px] font-black text-gray-500 uppercase">OTP</label>
-                                <input id="studentOtp" class="input-field" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 अंकों का OTP" />
-                            </div>
-                            <button type="button" onclick="actions.verifyStudentOtp()" class="everest-login-main-btn">✅ VERIFY & LOGIN <span>›</span></button>
-                            <button type="button" onclick="actions.setTab('studentLogin')" class="everest-login-back-btn">← Mobile Number बदलें</button>
-                        </div>
-                        <div class="everest-login-footer">EVEREST IT Student App</div>
+                        <div class="everest-login-footer">नाम + Mobile Number से Student Login</div>
                     </div>
                 </div>
             `,
@@ -4776,66 +4782,101 @@ studentDashboard: () => `
             `,
 
             adminStudents: () => {
-                const rows = Array.isArray(appState.onlineResults) ? appState.onlineResults : [];
-                const map = new Map();
+                const allStudents = Array.isArray(appState.onlineStudents) ? appState.onlineStudents : [];
+                const search = String(appState.studentSearch || '').trim().toLowerCase();
+                const rows = search
+                    ? allStudents.filter(s =>
+                        String(s.name || '').toLowerCase().includes(search) ||
+                        String(s.mobile || s.phoneNumber || '').toLowerCase().includes(search) ||
+                        String(s.uid || '').toLowerCase().includes(search)
+                    )
+                    : allStudents;
 
-                rows.forEach(r => {
-                    const name = String(r.studentName || 'Unknown Student').trim();
-                    const mobile = String(r.mobile || r.phone || r.phoneNumber || '').trim();
-                    const key = (mobile || name).toLowerCase();
-                    if (!map.has(key)) {
-                        map.set(key, { name, mobile, attempts: 0, lastTest: '', percentage: 0, latest: 0 });
+                const fmtTime = (student) => {
+                    if (student.updatedAt?.seconds) {
+                        return new Date(student.updatedAt.seconds * 1000).toLocaleString('en-IN', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
                     }
-                    const st = map.get(key);
-                    st.attempts += 1;
-                    st.lastTest = String(r.testTitle || 'Daily Test');
-                    st.percentage = Number(r.percentage || 0);
-                    st.latest = r.submittedAt?.seconds ? r.submittedAt.seconds : (Date.parse(r.date || '') || 0) / 1000;
-                });
-
-                const students = Array.from(map.values()).sort((a,b) => b.latest - a.latest);
+                    return '-';
+                };
 
                 return `
                 <div class="p-4 fade-in space-y-5 pb-32">
-                    <div class="bg-gradient-to-br from-blue-800 to-indigo-700 text-white rounded-3xl p-5 shadow-xl">
+                    <div class="bg-gradient-to-r from-cyan-700 to-blue-700 text-white rounded-3xl p-5 shadow-xl">
                         <div class="flex justify-between items-center gap-3">
                             <div>
                                 <h2 class="font-black text-xl">👨‍🎓 STUDENT LIST</h2>
-                                <p class="text-blue-100 text-[10px] font-bold mt-1 uppercase tracking-widest">EVEREST IT • Online Students</p>
+                                <p class="text-cyan-100 text-[10px] font-bold mt-1 uppercase tracking-widest">ADMIN ONLY • Firebase Students</p>
                             </div>
-                            <button onclick="actions.loadOnlineResults()" class="bg-white/15 text-white px-3 py-2 rounded-xl text-xs font-black">🔄 REFRESH</button>
+                            <button onclick="actions.loadOnlineStudents()" class="bg-white/15 px-3 py-2 rounded-xl text-xs font-black">🔄 REFRESH</button>
                         </div>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
-                        <div class="text-3xl font-black text-blue-700">${students.length}</div>
-                        <div class="text-[10px] font-black text-blue-800 uppercase">Unique Students</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-cyan-50 border border-cyan-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-cyan-700">${allStudents.length}</div>
+                            <div class="text-[10px] font-black text-cyan-800 uppercase">Total Students</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-black text-green-700">${rows.length}</div>
+                            <div class="text-[10px] font-black text-green-800 uppercase">Showing</div>
+                        </div>
                     </div>
 
-                    ${students.length ? students.map((st, idx) => `
-                        <div class="bg-white p-4 rounded-2xl border shadow-sm">
-                            <div class="flex items-start gap-3">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-black shrink-0">${idx + 1}</div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="font-black text-sm text-gray-800">${st.name}</div>
-                                    <div class="text-[11px] font-bold text-gray-500 mt-1">📱 ${st.mobile || 'Mobile number not available'}</div>
-                                    <div class="flex flex-wrap gap-2 mt-2">
-                                        <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-[9px] font-black">📝 ${st.attempts} Attempt${st.attempts > 1 ? 's' : ''}</span>
-                                        <span class="bg-green-50 text-green-700 px-2 py-1 rounded-lg text-[9px] font-black">🎯 ${st.percentage}%</span>
+                    <div class="bg-white rounded-3xl border shadow-sm p-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🔎</span>
+                            <input
+                                value="${String(appState.studentSearch || '').replace(/"/g, '&quot;')}"
+                                oninput="appState.studentSearch=this.value; render()"
+                                class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm outline-none"
+                                placeholder="Student Name / Mobile / UID से Search करें"
+                            />
+                        </div>
+                    </div>
+
+                    ${appState.onlineStudentsLoading ? `
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
+                            <p class="font-black text-blue-800">⏳ Firebase से Student List ला रहे हैं...</p>
+                        </div>
+                    ` : ''}
+
+                    ${appState.onlineStudentsError ? `
+                        <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+                            <p class="font-black text-red-800 text-sm">${appState.onlineStudentsError}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="space-y-3">
+                        ${rows.length ? rows.map((student, idx) => `
+                            <div class="bg-white p-4 rounded-2xl border shadow-sm">
+                                <div class="flex justify-between items-start gap-3">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center text-[10px] font-black">${idx + 1}</span>
+                                            <div class="text-sm font-black text-gray-800 uppercase truncate">${String(student.name || 'Unknown Student')}</div>
+                                        </div>
+                                        <div class="mt-3 space-y-2 text-xs">
+                                            <div><span class="font-black text-gray-400">📱 MOBILE:</span> <span class="font-bold text-gray-700">${String(student.mobile || student.phoneNumber || '-')}</span></div>
+                                            <div><span class="font-black text-gray-400">🆔 UID:</span> <span class="font-bold text-gray-700 break-all">${String(student.uid || student.firebaseId || '-')}</span></div>
+                                            <div><span class="font-black text-gray-400">🕐 LOGIN:</span> <span class="font-bold text-gray-700">${fmtTime(student)}</span></div>
+                                        </div>
                                     </div>
-                                    <div class="text-[9px] text-gray-400 font-bold mt-2">${st.lastTest}</div>
+                                    <button onclick='actions.viewStudentHistory(${JSON.stringify(student).replace(/'/g, "&apos;")})' class="shrink-0 bg-blue-100 text-blue-800 px-2 py-2 rounded-lg text-[9px] font-black">📊 HISTORY</button>
                                 </div>
                             </div>
-                        </div>
-                    `).join('') : `
-                        <div class="bg-white border rounded-3xl p-8 text-center">
-                            <div class="text-4xl mb-3">👨‍🎓</div>
-                            <p class="font-black text-gray-700">अभी कोई Student Result उपलब्ध नहीं है।</p>
-                            <p class="text-[10px] text-gray-400 font-bold mt-2">पहले Refresh करें या विद्यार्थियों से Test submit करवाएँ।</p>
-                        </div>
-                    `}
+                        `).join('') : `
+                            <div class="bg-white rounded-3xl border p-8 text-center">
+                                <div class="text-4xl mb-3">👨‍🎓</div>
+                                <p class="font-black text-gray-700">${allStudents.length ? 'Search करने पर कोई Student नहीं मिला।' : 'अभी कोई verified student record नहीं मिला।'}</p>
+                                <p class="text-xs text-gray-400 font-bold mt-2">Student Login के बाद record यहाँ दिखाई देगा।</p>
+                            </div>
+                        `}
+                    </div>
 
-                    <button onclick="actions.setTab('adminDashboard')" class="w-full py-3 bg-gray-100 rounded-xl font-bold">BACK TO ADMIN PANEL</button>
+                    <button onclick="actions.setTab('adminDashboard')" class="w-full py-3 bg-gray-100 rounded-xl font-bold">← BACK TO ADMIN</button>
                 </div>
                 `;
             },
@@ -6704,6 +6745,31 @@ studentDashboard: () => `
                 const { type, data } = appState.modal;
                 let content = '';
 
+                if(type === 'studentHistory') {
+                    const st = data?.student || {};
+                    const activities = Array.isArray(data?.activity) ? data.activity : [];
+                    const tests = Array.isArray(data?.testHistory) ? data.testHistory : [];
+                    const fmt = (x) => x?.seconds ? new Date(x.seconds * 1000).toLocaleString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '-';
+                    const combined = [
+                        ...activities.map(a => ({kind:'activity', time:a.createdAt, title:a.title || 'Activity', details:a.details || ''})),
+                        ...tests.map(r => ({kind:'test', time:r.submittedAt, title:r.testTitle || r.testId || 'Test', details:`Score: ${r.score ?? 0} • ${r.percentage ?? 0}%` }))
+                    ].sort((a,b)=>(b.time?.seconds||0)-(a.time?.seconds||0));
+                    content = `
+                        <h3 class="font-black text-lg mb-2">📊 STUDENT HISTORY</h3>
+                        <div class="bg-gray-50 rounded-2xl p-4 mb-4 text-sm">
+                            <div class="font-black">👤 ${String(st.name || 'Student')}</div>
+                            <div class="font-bold text-gray-600 mt-1">📱 ${String(st.mobile || st.phoneNumber || '-')}</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="bg-blue-50 rounded-xl p-3 text-center"><div class="text-xl font-black text-blue-700">${activities.length}</div><div class="text-[9px] font-black">ACTIVITY</div></div>
+                            <div class="bg-green-50 rounded-xl p-3 text-center"><div class="text-xl font-black text-green-700">${tests.length}</div><div class="text-[9px] font-black">TESTS</div></div>
+                        </div>
+                        <div class="space-y-2 max-h-[55vh] overflow-auto">
+                            ${combined.length ? combined.map(x => `<div class="border rounded-xl p-3 bg-white"><div class="font-black text-sm">${x.kind === 'test' ? '📝' : '📌'} ${String(x.title)}</div><div class="text-xs text-gray-600 mt-1">${String(x.details)}</div><div class="text-[10px] text-gray-400 font-bold mt-1">${fmt(x.time)}</div></div>`).join('') : '<div class="text-center text-gray-400 py-8 font-bold">अभी कोई history नहीं मिली।</div>'}
+                        </div>
+                        <button onclick="actions.closeModal()" class="w-full mt-4 py-3 bg-gray-100 rounded-xl font-bold">CLOSE</button>
+                    `;
+                } else 
                 if(type === 'addChapter' || type === 'editChapter') {
                     content = `
                         <h3 class="font-black text-lg mb-6">${data ? 'Edit':'Add'} Chapter</h3>
@@ -6787,7 +6853,6 @@ studentDashboard: () => `
                 case 'hindiTyping': main = UI.hindiTyping(); break;
                 case 'login': main = UI.login(); break;
                 case 'studentLogin': main = UI.studentLogin(); break;
-                case 'studentOtp': main = UI.studentOtp(); break;
                 case 'adminLogin': main = UI.adminLogin(); break;
                 case 'studentDashboard': main = UI.studentDashboard(); break;
                 case 'adminDashboard': main = UI.adminDashboard(); break;
