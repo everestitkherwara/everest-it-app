@@ -611,6 +611,7 @@ a.everest-force-back {
         phoneNumber: '+91' + mobile,
         firstLoginAt: old.firstLoginAt || serverTimestamp(),
         lastLoginAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
         loginCount: Number(old.loginCount || 0) + 1,
         source: "EVEREST IT STUDENT APP"
       };
@@ -636,8 +637,58 @@ a.everest-force-back {
     },
 
     getStudents: async () => {
+      // Read the main students collection first.
       const snap = await getDocs(collection(firestore, "students"));
-      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
+      const students = snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
+
+      // Also read login activity as a fallback so a successful Student Login
+      // is visible in Admin even if an older student document was not created.
+      try {
+        const activitySnap = await getDocs(collection(firestore, "studentActivity"));
+        const byMobile = new Map();
+        activitySnap.docs.forEach(docSnap => {
+          const x = docSnap.data() || {};
+          const mobile = String(x.studentMobile || '').replace(/\D/g, '');
+          if (!/^\d{10}$/.test(mobile) || !x.studentName) return;
+          const old = byMobile.get(mobile);
+          const t = x.createdAt?.seconds || 0;
+          if (!old || t >= (old.createdAt?.seconds || 0)) {
+            byMobile.set(mobile, {
+              name: String(x.studentName).trim(),
+              mobile,
+              phoneNumber: '+91' + mobile,
+              uid: 'student-' + mobile,
+              updatedAt: x.createdAt || null,
+              lastLoginAt: x.createdAt || null,
+              source: 'EVEREST IT STUDENT APP'
+            });
+          }
+        });
+
+        const merged = new Map();
+        students.forEach(s => {
+          const mobile = String(s.mobile || s.phoneNumber || '').replace(/\D/g, '');
+          if (mobile) merged.set(mobile, { ...s, mobile });
+        });
+        byMobile.forEach((a, mobile) => {
+          const existing = merged.get(mobile);
+          merged.set(mobile, {
+            ...a,
+            ...(existing || {}),
+            // Latest login activity name is authoritative for the Admin list.
+            name: a.name || existing?.name || 'Student',
+            mobile,
+            phoneNumber: existing?.phoneNumber || a.phoneNumber,
+            uid: existing?.uid || a.uid,
+            updatedAt: a.updatedAt || existing?.updatedAt,
+            lastLoginAt: a.lastLoginAt || existing?.lastLoginAt
+          });
+        });
+        return Array.from(merged.values());
+      } catch (activityErr) {
+        console.warn('Student activity fallback skipped:', activityErr);
+        return students;
+      }
     }
   };
 </script>
@@ -2889,8 +2940,8 @@ a.everest-force-back {
                 try {
                     const rows = await window.EverestFirebase.getStudents();
                     appState.onlineStudents = rows.sort((a, b) => {
-                        const da = a.updatedAt?.seconds || 0;
-                        const dbb = b.updatedAt?.seconds || 0;
+                        const da = a.updatedAt?.seconds || a.lastLoginAt?.seconds || 0;
+                        const dbb = b.updatedAt?.seconds || b.lastLoginAt?.seconds || 0;
                         return dbb - da;
                     });
                 } catch (err) {
