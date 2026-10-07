@@ -2765,51 +2765,39 @@ a.everest-force-back {
                 window.scrollTo(0,0); render();
             },
             login: async (e) => {
-                e.preventDefault();
+                if (e) e.preventDefault();
                 const name = document.getElementById('studentName')?.value?.trim() || '';
                 const mobileRaw = document.getElementById('studentMobile')?.value?.trim() || '';
                 const mobile = mobileRaw.replace(/\D/g, '');
-                if (!name) { alert("कृपया अपना पूरा नाम लिखें।"); return; }
-                if (!/^\d{10}$/.test(mobile)) { alert("कृपया 10 अंकों का Indian Mobile Number डालें।"); return; }
-                const user = {
-                    name,
-                    mobile,
-                    phoneNumber: '+91' + mobile,
-                    uid: 'student-' + mobile
-                };
-                // Firebase Anonymous Auth is used when available. Even if Firebase
-                // authentication temporarily fails, do NOT block the student's local login.
-                // This keeps the app usable while Firebase history can be retried later.
-                let firebaseAuthOk = !!auth.currentUser;
-                if (!firebaseAuthOk) {
-                    try {
-                        await signInAnonymously(auth);
-                        firebaseAuthOk = !!auth.currentUser;
-                    } catch (authErr) {
-                        console.warn('Anonymous Auth unavailable; continuing with local login:', authErr);
-                    }
-                }
+                if (!name) { alert("कृपया अपना पूरा नाम लिखें।"); return false; }
+                if (!/^\d{10}$/.test(mobile)) { alert("कृपया 10 अंकों का Indian Mobile Number डालें।"); return false; }
+                const user = { name, mobile, phoneNumber: '+91' + mobile, uid: 'student-' + mobile };
+
+                // Student login opens immediately. Firebase history is saved in background.
                 appState.currentUser = user;
                 window.__everestStudentSession = user;
                 try { localStorage.setItem('everestStudent', JSON.stringify(user)); } catch (_) {}
-                if (firebaseAuthOk) {
-                    try {
-                        await window.EverestFirebase.saveStudent(user);
-                        await window.EverestFirebase.saveStudentActivity({ type: 'login', title: 'Student Login', details: 'App में Login किया', student: user });
-                    } catch (err) {
-                        console.error('Student Firebase save failed:', err);
-                    }
-                }
 
                 if (window.__everestReturnToTodayTest) {
                     window.__everestReturnToTodayTest = false;
                     const idx = db.mockTests['RS-CIT'].findIndex(t => t.id === 'today-lesson2');
-                    if (idx >= 0) {
-                        actions.startTest('RS-CIT', idx);
-                        return;
-                    }
+                    if (idx >= 0) actions.startTest('RS-CIT', idx);
+                    else actions.setTab('studentDashboard');
+                } else {
+                    actions.setTab('studentDashboard');
                 }
-                actions.setTab('studentDashboard');
+
+                // Firebase work must never block the student from entering the app.
+                (async () => {
+                    try {
+                        if (!auth.currentUser) await signInAnonymously(auth);
+                        await window.EverestFirebase.saveStudent(user);
+                        await window.EverestFirebase.saveStudentActivity({ type: 'login', title: 'Student Login', details: 'App में Login किया', student: user });
+                    } catch (err) {
+                        console.warn('Firebase student history save skipped:', err);
+                    }
+                })();
+                return false;
             },
             viewStudentHistory: async (student) => {
                 if (!appState.isAdmin) return;
@@ -4546,7 +4534,7 @@ ${db.courses.map(c => `
                             <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
                             <div class="everest-login-tagline">नाम + Mobile Number → Login 🚀</div>
                         </div>
-                        <form onsubmit="actions.login(event)" class="space-y-5">
+                        <form onsubmit="return actions.login(event)" class="space-y-5">
                             <div class="input-group">
                                 <label class="text-[10px] font-black text-gray-500 uppercase">Student Name</label>
                                 <input id="studentName" required class="input-field" autocomplete="name" placeholder="अपना पूरा नाम लिखें" />
