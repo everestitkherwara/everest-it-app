@@ -2784,7 +2784,7 @@ a.everest-force-back {
                     if (idx >= 0) actions.startTest('RS-CIT', idx);
                     else actions.setTab('studentDashboard');
                 } else {
-                    actions.setTab('studentDashboard');
+                    window.actions.setTab('studentDashboard');
                 }
 
                 // Firebase work must never block the student from entering the app.
@@ -3456,7 +3456,7 @@ a.everest-force-back {
                             </div>
                             <h1 class="header-title">${db.settings.name}, खेरवाड़ा</h1>
                         </div>
-                        <button onclick="actions.setTab(appState.isAdmin ? 'adminDashboard' : (appState.currentUser ? 'studentDashboard' : 'studentLogin'))" class="header-action-btn" aria-label="Student Login">
+                        <button onclick="window.actions.setTab('login')" class="header-action-btn" aria-label="Login">
                             ${appState.isAdmin ? ICONS.admin : (appState.currentUser ? ICONS.check : ICONS.login)}
                         </button>
                     </div>
@@ -4534,7 +4534,7 @@ ${db.courses.map(c => `
                             <p>EVEREST IT ज्ञान केंद्र, खेरवाड़ा</p>
                             <div class="everest-login-tagline">नाम + Mobile Number → Login 🚀</div>
                         </div>
-                        <form onsubmit="return actions.login(event)" class="space-y-5">
+                        <form onsubmit="return window.actions.login(event)" class="space-y-5">
                             <div class="input-group">
                                 <label class="text-[10px] font-black text-gray-500 uppercase">Student Name</label>
                                 <input id="studentName" required class="input-field" autocomplete="name" placeholder="अपना पूरा नाम लिखें" />
@@ -6885,8 +6885,18 @@ studentDashboard: () => `
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            actions.syncDefaultTests();
+            window.actions.syncDefaultTests();
             render();
+
+            // Defensive login wiring: ensure the Student Login form always reaches
+            // the same login action even if browser inline event handling is quirky.
+            document.addEventListener('submit', (ev) => {
+                const form = ev.target;
+                if (form && form.querySelector && form.querySelector('#studentName') && form.querySelector('#studentMobile')) {
+                    ev.preventDefault();
+                    window.actions.login(ev);
+                }
+            });
 
             // Register Service Worker for PWA
             if ('serviceWorker' in navigator) {
