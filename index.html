@@ -611,7 +611,6 @@ a.everest-force-back {
         phoneNumber: '+91' + mobile,
         firstLoginAt: old.firstLoginAt || serverTimestamp(),
         lastLoginAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
         loginCount: Number(old.loginCount || 0) + 1,
         source: "EVEREST IT STUDENT APP"
       };
@@ -637,58 +636,8 @@ a.everest-force-back {
     },
 
     getStudents: async () => {
-      // Read the main students collection first.
       const snap = await getDocs(collection(firestore, "students"));
-      const students = snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
-
-      // Also read login activity as a fallback so a successful Student Login
-      // is visible in Admin even if an older student document was not created.
-      try {
-        const activitySnap = await getDocs(collection(firestore, "studentActivity"));
-        const byMobile = new Map();
-        activitySnap.docs.forEach(docSnap => {
-          const x = docSnap.data() || {};
-          const mobile = String(x.studentMobile || '').replace(/\D/g, '');
-          if (!/^\d{10}$/.test(mobile) || !x.studentName) return;
-          const old = byMobile.get(mobile);
-          const t = x.createdAt?.seconds || 0;
-          if (!old || t >= (old.createdAt?.seconds || 0)) {
-            byMobile.set(mobile, {
-              name: String(x.studentName).trim(),
-              mobile,
-              phoneNumber: '+91' + mobile,
-              uid: 'student-' + mobile,
-              updatedAt: x.createdAt || null,
-              lastLoginAt: x.createdAt || null,
-              source: 'EVEREST IT STUDENT APP'
-            });
-          }
-        });
-
-        const merged = new Map();
-        students.forEach(s => {
-          const mobile = String(s.mobile || s.phoneNumber || '').replace(/\D/g, '');
-          if (mobile) merged.set(mobile, { ...s, mobile });
-        });
-        byMobile.forEach((a, mobile) => {
-          const existing = merged.get(mobile);
-          merged.set(mobile, {
-            ...a,
-            ...(existing || {}),
-            // Latest login activity name is authoritative for the Admin list.
-            name: a.name || existing?.name || 'Student',
-            mobile,
-            phoneNumber: existing?.phoneNumber || a.phoneNumber,
-            uid: existing?.uid || a.uid,
-            updatedAt: a.updatedAt || existing?.updatedAt,
-            lastLoginAt: a.lastLoginAt || existing?.lastLoginAt
-          });
-        });
-        return Array.from(merged.values());
-      } catch (activityErr) {
-        console.warn('Student activity fallback skipped:', activityErr);
-        return students;
-      }
+      return snap.docs.map(docSnap => ({ firebaseId: docSnap.id, ...docSnap.data() }));
     }
   };
 </script>
@@ -715,12 +664,49 @@ a.everest-force-back {
         };
 
         const OLD_PAPERS_INDEX = {
-            "2026": ["02 August 2026", "19 July 2026", "12 April 2026", "29 March 2026"],
+            "2026": ["04 October 2026", "02 August 2026", "19 July 2026", "12 April 2026", "29 March 2026"],
             "2025": ["21 December 2025", "14 December 2025", "24 August 2025", "3 August 2025", "27 April 2025"],
             "2024": ["22 December 2024", "06 October 2024", "18 August 2024", "04 August 2024", "10 March 2024"]
         };
 
         const OLD_PAPERS_DATA = {
+            "04 October 2026": [
+                { "id": 1, "qH": "निम्नलिखित में से कौनसा एक एप्लिकेशन सॉफ्टवेयर नहीं है?", "qE": "Which of the following is not an application software?", "options": ["Google Chrome / गूगल क्रोम", "Photoshop / फोटोशॉप", "Windows 7 / विंडोज 7", "Notepad / नोटपैड"], "ans": 2 },
+                { "id": 2, "qH": "डेटा एक्सेस को गति देने के लिए CPU और Main Memory के बीच कौनसी हाई-स्पीड सेमीकंडक्टर मेमोरी स्थित होती है?", "qE": "Which high-speed semiconductor memory resides between the CPU and Main Memory to speed up data access?", "options": ["ROM / ROM", "Secondary Memory / माध्यमिक मेमोरी", "UV Memory / यूवी मेमोरी", "Cache Memory / कैश मेमोरी"], "ans": 3 },
+                { "id": 3, "qH": "विंडोज का कौनसा अंतर्निर्मित यूटिलिटी आयताकार, फ्री-फॉर्म या फुल-स्क्रीन स्क्रीनशॉट कैप्चर करता है?", "qE": "Which builtin Windows utility captures rectangular, free-form or full-screen screenshots?", "options": ["Paint / पेंट", "Snipping Tool / स्निपिंग टूल", "Math Input Panel / मैथ इनपुट पैनल", "Calculator / कैलकुलेटर"], "ans": 1 },
+                { "id": 4, "qH": "वह उपकरण जो डिजिटल कंप्यूटर सिग्नलों को एनालॉग टेलीफोन सिग्नलों में और इसके विपरीत परिवर्तित करता है, कहलाता है —", "qE": "A device that converts digital computer signals to analog telephone signals and vice versa is called a", "options": ["Router / राउटर", "Switch / स्विच", "Modem / मॉडेम", "Hub / हब"], "ans": 2 },
+                { "id": 5, "qH": "क्रेडिट या डेबिट कार्ड के पीछे छपे तीन अंकों के सुरक्षा कोड को क्या कहते हैं?", "qE": "What is the 3-digit security code printed on the back of a credit or debit card called?", "options": ["PIN / पिन", "OTP / ओटीपी", "CVV/CVD2 / सी.वी.वी./सी.वी.डी.2", "IFSC Code / आई.एफ.एस.सी. कोड"], "ans": 2 },
+                { "id": 6, "qH": "आधुनिक भारतीय मोबाइल बैंकिंग में UPI का पूरा नाम क्या है?", "qE": "What does UPI stand for in modern Indian mobile banking?", "options": ["Unified Payment Interface / यूनिफाइड पेमेंट इंटरफेस", "Uniform Payment Internet / यूनिफॉर्म पेमेंट इंटरनेट", "Universal Payment Integration / यूनिवर्सल पेमेंट इंटीग्रेशन", "Uninterrupted Payment Interface / अनइंटरप्टेड पेमेंट इंटरफेस"], "ans": 0 },
+                { "id": 7, "qH": "एक ऑनलाइन प्लेटफॉर्म जहाँ एक विनिर्माण कंपनी दूसरी खुदरा कंपनी को थोक कच्चा माल या थोक इन्वेंट्री सीधे बेचती है, उसे किस नाम से जाना जाता है?", "qE": "An online platform where one manufacturing company sells raw material or wholesale inventory directly to another retail company is known as", "options": ["Business-to-Business (B2B) / बिजनेस-टू-बिजनेस (B2B)", "Business-to-Consumer (B2C) / बिजनेस-टू-कंज्यूमर (B2C)", "Consumer-to-Business (C2B) / कंज्यूमर-टू-बिजनेस (C2B)", "Consumer-to-Consumer (C2C) / कंज्यूमर-टू-कंज्यूमर (C2C)"], "ans": 0 },
+                { "id": 8, "qH": "Google Pay, Paytm और PhonePe इसके उदाहरण हैं —", "qE": "Google Pay, Paytm and PhonePe are examples of", "options": ["Mobile Operating Systems / मोबाइल ऑपरेटिंग सिस्टम", "Mobile/Digital Wallets / मोबाइल/डिजिटल वॉलेट", "Web Browsers / वेब ब्राउजर", "E-Commerce Platforms / ई-कॉमर्स प्लेटफॉर्म"], "ans": 1 },
+                { "id": 9, "qH": "राजस्थान सरकार द्वारा भारतीय सूचना प्रौद्योगिकी अधिनियम, 2000 के तहत अधिकृत इलेक्ट्रॉनिक हस्ताक्षरों को निम्नलिखित नामों से जाना जाता है —", "qE": "Electronic signatures authorized under the Indian IT Act, 2000 by the Rajasthan Government are known as", "options": ["Raj e-Sign / राज ई-साइन", "Quick Sign / क्विक साइन", "Biosign / बायोसाइन", "Smart Signature / स्मार्ट हस्ताक्षर"], "ans": 0 },
+                { "id": 10, "qH": "राजस्थान में निवास/वास्तविकता प्रमाण पत्र के लिए ऑनलाइन आवेदन करना निम्नलिखित माध्यमों से किया जाता है —", "qE": "Applying for a Domicile / Bonafide Certificate online in Rajasthan is facilitated through", "options": ["e-Mitra / SSO Portal / ई-मित्रा / एस.एस.ओ. पोर्टल", "IRCTC / आईआरसीटीसी", "NVSP / एनवीएसपी", "Google Play Store / गूगल प्ले स्टोर"], "ans": 0 },
+                { "id": 11, "qH": "आधिकारिक Income Tax e-Filing Portal पर पंजीकरण करते समय डिफॉल्ट User ID के रूप में क्या कार्य करता है?", "qE": "What serves as the default User ID when registering on the official Income Tax e-Filing portal?", "options": ["Aadhaar Number / आधार संख्या", "PAN (Permanent Account Number) / पैन", "Passport Number / पासपोर्ट नंबर", "Mobile Number / मोबाइल नंबर"], "ans": 1 },
+                { "id": 12, "qH": "Android फोन पर Google Play Store से applications access और download करने के लिए उपयोगकर्ता को कौनसा account configure करना होगा?", "qE": "To access and download applications from the Google Play Store on an Android phone, a user must configure which account?", "options": ["Yahoo Mail / याहू मेल", "SSOID / एसएसओ आईडी", "Apple ID / एप्पल आईडी", "Gmail / Google Account / जीमेल / गूगल खाता"], "ans": 3 },
+                { "id": 13, "qH": "कर्सर के दाईं ओर के text को एक-एक अक्षर करके कौनसी कुंजी delete करती है?", "qE": "Which key deletes text one character at a time to the right side of the cursor?", "options": ["Backspace / बैकस्पेस", "Delete / डिलीट", "End / एंड", "Home / होम"], "ans": 1 },
+                { "id": 14, "qH": "कौनसा keyboard shortcut एक document की समस्त विषयवस्तु को एक साथ select करता है?", "qE": "Which keyboard shortcut combination selects all the contents of a document at once?", "options": ["Ctrl + A", "Ctrl + S", "Ctrl + Shift + A", "Alt + A"], "ans": 0 },
+                { "id": 15, "qH": "MS Word 2010 में Paragraph Alignment की default setting क्या है?", "qE": "What is the default paragraph alignment setting in MS Word 2010?", "options": ["Align Text Left / अलाइन टेक्स्ट लेफ्ट", "Center / सेंटर", "Align Text Right / अलाइन टेक्स्ट राइट", "Justify / जस्टिफाई"], "ans": 0 },
+                { "id": 16, "qH": "MS Excel 2010 में horizontal x-axis पर continuous time intervals में data trends को plot करने के लिए कौनसा chart type आदर्श है?", "qE": "Which chart type in MS Excel 2010 is ideal for plotting data trends over continuous time intervals on the horizontal x-axis?", "options": ["Pie Chart / पाई चार्ट", "Bar Chart / बार चार्ट", "Line Chart / लाइन चार्ट", "Radar Chart / रडार चार्ट"], "ans": 2 },
+                { "id": 17, "qH": "कीबोर्ड पर कौनसी shortcut key दबाने से Slide Show शुरू से तुरंत चलने लगता है?", "qE": "Pressing which shortcut key instantly starts a Slide Show from the beginning?", "options": ["F1", "F5", "F7", "F11"], "ans": 1 },
+                { "id": 18, "qH": "Slide पर ऊपर से नीचे की ओर धीरे-धीरे रंग बदलने वाला background fill effect कहलाता है —", "qE": "A background fill effect where color is gradually shaded from top to bottom on a slide is known as a", "options": ["Solid Fill / सॉलिड फिल", "Texture Fill / टेक्सचर फिल", "Gradient Fill / ग्रेडिएंट फिल", "Pattern Fill / पैटर्न फिल"], "ans": 2 },
+                { "id": 19, "qH": "कौनसा प्राथमिक भारतीय कानून electronic commerce और cybercrimes को नियंत्रित करता है तथा digital signatures को कानूनी मान्यता प्रदान करता है?", "qE": "Which primary Indian law governs electronic commerce and cybercrimes, providing legal recognition for digital signatures?", "options": ["Indian IT Act, 2000 / भारतीय सूचना प्रौद्योगिकी अधिनियम, 2000", "Indian Penal Code / भारतीय दंड संहिता", "Indian Contract Act, 1872 / भारतीय अनुबंध अधिनियम, 1872", "Copyright Act / कॉपीराइट अधिनियम"], "ans": 0 },
+                { "id": 20, "qH": "किसी वेबसाइट पर निजी जानकारी या password दर्ज करने से पहले कौनसे दो संकेतक सुरक्षित connection को दर्शाते हैं?", "qE": "Before entering private details or passwords on a website, which two indicators signify a secure connection?", "options": ["Browser में padlock symbol और web address का https:// से शुरू होना", ".com extension और bold text", "Pop-up banner और high-speed internet", "http:// prefix और green text"], "ans": 0 },
+                { "id": 21, "qH": "Column-I के computer peripheral devices को Column-II में दिए गए उनके सही primary functions से मिलाएँ।", "qE": "Match the Computer Peripheral Devices given in Column-I with their correct Primary Functions given in Column-II.", "options": ["(1)-B, (2)-D, (3)-A, (4)-C", "(1)-A, (2)-C, (3)-D, (4)-B", "(1)-D, (2)-B, (3)-C, (4)-A", "(1)-C, (2)-A, (3)-B, (4)-D"], "ans": 0 },
+                { "id": 22, "qH": "अक्सर email attachment के माध्यम से PC पर भेजे जाते हैं और अक्सर नुकसान पहुँचाने के इरादे से बनाए जाते हैं।", "qE": "... are often delivered to a PC through an email attachment and are often designed to do harm.", "options": ["Portals / पोर्टल", "Spam / स्पैम", "WWW / वर्ल्ड वाइड वेब", "None of the above / उपर्युक्त में से कोई नहीं"], "ans": 3 },
+                { "id": 23, "qH": "नीचे दिए गए दो कथनों में सही विकल्प चुनें: कथन (1): ROM में स्थायी रूप से संग्रहीत software programs को Malware कहा जाता है। कथन (2): Web traffic को गलत दिशा में मोड़ने के लिए computer/server पर स्थापित malicious code को Phishing कहा जाता है।", "qE": "Statement (1): Software programs permanently stored in ROM are called Malware. Statement (2): Malicious code installed on a computer/server to misdirect web traffic is called Phishing. Select the most appropriate option.", "options": ["कथन (1) सही है एवं कथन (2) सही है", "कथन (1) गलत है एवं कथन (2) सही है", "कथन (1) सही है एवं कथन (2) गलत है", "कथन (1) गलत है एवं कथन (2) गलत है"], "ans": 3 },
+                { "id": 24, "qH": "एक presenter PowerPoint presentation की 30 slides का क्रम जल्दी बदलना चाहता है। सभी slides की thumbnail images एक screen पर देखने के लिए कौनसा view सबसे अच्छा है?", "qE": "A presenter wants to rearrange the order of 30 PowerPoint presentation slides quickly by viewing thumbnail images of all slides on one screen. Which view is best for this?", "options": ["Normal View / सामान्य दृश्य", "Slide Sorter View / स्लाइड सॉर्टर दृश्य", "Slide Show View / स्लाइड शो दृश्य", "Notes Page View / नोट्स पृष्ठ दृश्य"], "ans": 1 },
+                { "id": 25, "qH": "निम्नलिखित में से कौनसा higher education के लिए Ministry of Education की open-source educational repository और MOOC initiative है?", "qE": "Which of the following is an open-source educational repository and MOOC initiative of the Ministry of Education for higher education?", "options": ["SWAYAM", "Google Chrome", "MS Office", "Windows Defender"], "ans": 0 },
+                { "id": 26, "qH": "कंप्यूटर का प्राथमिक उद्देश्य ______ को process करना और उसे information में परिवर्तित करना है।", "qE": "The primary purpose of a computer is to process ______ and convert it into information.", "options": ["Electricity / बिजली", "Data / डेटा", "Raw material / कच्चा माल", "Water / पानी"], "ans": 1 },
+                { "id": 27, "qH": "कथन (1): Shift + Delete keys का उपयोग करने से file/folder permanently delete हो जाता है और Recycle Bin में उपलब्ध नहीं होता। कथन (2): Windows 10 में separate user accounts प्रत्येक user के लिए unique settings और preferences प्रदान करते हैं।", "qE": "Statement (1): Using Shift + Delete permanently deletes the file/folder and it is not available in the Recycle Bin. Statement (2): Separate user accounts allow unique settings and preferences for each user in Windows 10.", "options": ["कथन (1) सही है और कथन (2) गलत है", "कथन (1) गलत है और कथन (2) सही है", "कथन (1) और कथन (2) दोनों गलत हैं", "कथन (1) और कथन (2) दोनों सही हैं"], "ans": 3 },
+                { "id": 28, "qH": "आप email के माध्यम से files, videos और photos निम्न प्रकार से भेज सकते हैं —", "qE": "You can send files, videos and photos in your emails using", "options": ["CC / प्रतिलिपि", "BCC / गुप्त प्रतिलिपि", "Wikipedia", "Attachments / संलग्नक"], "ans": 3 },
+                { "id": 29, "qH": "MS Word में बनाई गई file का default name क्या है?", "qE": "What is the default name of the file created in Word?", "options": ["Workbook1", "Worksheet1", "Document1", "Book1"], "ans": 2 },
+                { "id": 30, "qH": "Visited websites द्वारा user's hard drive पर preferences store करने और return visits track करने के लिए save की जाने वाली छोटी text files कहलाती हैं —", "qE": "Small text files saved on a user's hard drive by visited websites to store preferences and track return visits are known as", "options": ["Web Beacons / वेब बीकन", "Plug-ins / प्लग-इन", "Cookies / कुकीज", "Firewalls / फायरवॉल"], "ans": 2 },
+                { "id": 31, "qH": "किसी text को delete किए बिना उसकी original position से दूसरी position पर ले जाने को कहते हैं —", "qE": "To move the text from its original position to another position without deleting is called", "options": ["Scrolling / स्क्रॉलिंग", "Moving / मूविंग", "Halting / हाल्टिंग", "Copying / कॉपीइंग"], "ans": 1 },
+                { "id": 32, "qH": "Email address में कौनसा element/symbol हमेशा required होता है?", "qE": "In an email address, which element/symbol is always required?", "options": ["@", "=", "#", "+"], "ans": 0 },
+                { "id": 33, "qH": "Computer के अंदर मौजूद मुख्य printed circuit board को क्या कहते हैं जो CPU, memory और expansion cards को आपस में जोड़ता है?", "qE": "What is the main printed circuit board inside a computer that connects the CPU, memory and expansion cards called?", "options": ["Motherboard / मदरबोर्ड", "Hard Drive / हार्ड ड्राइव", "Expansion Port / एक्सपेंशन पोर्ट", "Control Bus / कंट्रोल बस"], "ans": 0 },
+                { "id": 34, "qH": "कौनसा common external port standard pen drive, keyboard और mouse जैसे external accessories को जोड़ने के लिए Plug and Play functionality प्रदान करता है?", "qE": "Which common external port standard provides Plug and Play functionality for connecting external accessories like pen drives, keyboards, and mouse?", "options": ["VGA Port / वीजीए पोर्ट", "USB (Universal Serial Bus) / यूएसबी", "Serial Port / सीरियल पोर्ट", "Parallel Port / पैरेलल पोर्ट"], "ans": 1 },
+                { "id": 35, "qH": "अमन public cyber cafe में computer का उपयोग करके exam results देख रहा है। वह चाहता है कि browser उसकी browsing history या passwords save न करे। उसे browser का कौनसा feature खोलना चाहिए?", "qE": "Aman is using a computer at a public cyber cafe to check his exam results. He wants to ensure the browser does not save his browsing history or passwords on that computer. Which browser feature should he open?", "options": ["Incognito / Private Window", "Zoom Window", "Desktop Shortcut", "Full-Screen View"], "ans": 0 }
+        ],
             "02 August 2026": [
                 { "id": 1, "qH": "इस पथ में 'A' का अर्थ है :", "qE": "A:\\Kota\\VMOU\\rscit.bmp What does 'A' represent in the following path? A:\\Kota\\VMOU\\rscit.bmp", "options": ["शीर्ष-स्तरीय फोल्डर / Top-level folder", "ड्राइव का नाम / Drive name", "उपफोल्डर / Subfolder", "फ़ाइल नाम / File name"], "ans": 1 },
                 { "id": 2, "qH": "राजस्थान सरकार का पोर्टल \"राज ई-साइन\" अपने नागरिकों और विभागों को कौन सी आवश्यक सेवा प्रदान करता है?", "qE": "Which essential service does the Rajasthan Government's \"Raj e-Sign\" portal provide to its citizens and departments?", "options": ["राज्य के लोगो का डिजाइन तैयार करना / Designing the state logo", "दस्तावेजों के लिए अनुकूलित, कानूनी रूप से मान्य इलेक्ट्रॉनिक/डिजिटल हस्ताक्षर प्रदान करना / Providing legally valid electronic/digital signatures for documents", "मुफ्त बिजली के लिए पंजीकरण करना / Registering for free electricity", "वेबसाइटों का स्थानीय भाषा में अनुवाद करना / Translating websites into the local language"], "ans": 1 },
@@ -2940,8 +2926,8 @@ a.everest-force-back {
                 try {
                     const rows = await window.EverestFirebase.getStudents();
                     appState.onlineStudents = rows.sort((a, b) => {
-                        const da = a.updatedAt?.seconds || a.lastLoginAt?.seconds || 0;
-                        const dbb = b.updatedAt?.seconds || b.lastLoginAt?.seconds || 0;
+                        const da = a.updatedAt?.seconds || 0;
+                        const dbb = b.updatedAt?.seconds || 0;
                         return dbb - da;
                     });
                 } catch (err) {
